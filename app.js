@@ -5,16 +5,34 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
+// Les middlewares de l'app
+var nodemailer = require('nodemailer');
+var moment = require('moment');
+var busboy = require('connect-busboy');
+var fs = require('fs');
+var crypto = require('crypto');
+var htmlspecialchars = require('htmlspecialchars');
+
+var PirateBay = require('thepiratebay');
+var tnp = require('torrent-name-parser');
+var imdb = require('imdb-api');
+var mongoose = require('mongoose');
+
+//// require ROUTES ! /////
 var index = require('./routes/index');
 var users = require('./routes/users');
-var mongoose = require('mongoose');
+var root = require('./routes/root');
+var home = require('./routes/home');
+
+
 
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.listen(8000);
+var server = app.listen(8080);
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -34,13 +52,56 @@ app.use((req, res, next) => {
 ///// THIS ! ///////
 app.use('/', index);
 app.use('/users', users);
+app.use('/home', home);
+app.use('/root', root);
 ////// ALL TIME :P //////
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+
+//Le système de navigation via socket
+var io = require('socket.io').listen(server);
+io.sockets.on('connection', function (socket) {
+
+    socket.on('getFilmsList', function(data) {
+        // var results = '';
+        PirateBay
+            .topTorrents(201)
+            .then(filmsList => {
+                // results = filmsList;
+                console.log(filmsList[0])
+                var torrentDatas = tnp(filmsList[0].name)
+                console.log(torrentDatas)
+                imdb.get(torrentDatas.title)
+                    .then(movieDatas => {
+                        console.log(movieDatas)
+                        filmsList[0].movieDatas = movieDatas
+                        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                        console.log(filmsList[0])
+                        console.log(filmsList[0].movieDatas.title)
+
+                        // if (i = (filmsList.length - 1)) {
+                        // 	io.to(data.id).emit('browseFilmsList', {filmsList: filmsList})
+                        // }
+                    })
+                    .catch(err => console.log(err))
+
+                // for (var i = 0; i < filmsList.length; i++) {
+                // }
+
+            })
+            .catch(err => console.log(err));
+        // movieDB => filmsList[i].movieDB = movieDB
+
+
+        // .then(filmsList =>
+
+        // 	imdb.getReq({ name: filmsList[0].name })
+        // 		.then(console.log)
+        // 		.catch(err => console.log(err)));
+        // io.to(data.id).emit('browseFilmsList', {filmsList: filmsList});
+    });
+
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -52,5 +113,11 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+//app.use(function(req, res, next) {
+  //  var err = new Error('Not Found');
+    //err.status = 404;
+    //next(err);
+//});
+
 
 module.exports = app;

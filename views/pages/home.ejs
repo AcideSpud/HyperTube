@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+	<% include header %>
+	<!-- Links CSS -->
+	<link rel="stylesheet" type="text/css" href="../../stylesheets/home.css">
+
+	
+	<body>
+	
+		<main class="wrapper">
+		<% include nav %>
+
+		<div class="container">
+			<ul id="filmsList">
+				
+			</ul>
+			
+		</div>			
+
+		<%	include footer %>
+		</main>
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+
+				var socket = io.connect('http://localhost:8080');
+		    	socket.on('connect', function() {
+			        socket.emit('getFilmsList', {id: socket.id});
+
+			        socket.on('browseFilmsList', function(data){
+						var filmsList = data.filmsList;
+						for (var i = 0; i < filmsList.length; i++) {
+							var film = document.createElement('li');
+							film.textContent = filmsList[i].name;
+							$('#filmsList').append(film);
+						}
+					});
+		    	});
+		</script>
+
+
+
+	</body>
+
+</html>
