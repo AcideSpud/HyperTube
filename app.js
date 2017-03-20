@@ -24,6 +24,8 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var root = require('./routes/root');
 var home = require('./routes/home');
+var inscription = require('./routes/inscription');
+var connexion = require('./routes/connexion');
 
 
 
@@ -53,7 +55,10 @@ app.use((req, res, next) => {
 app.use('/', index);
 app.use('/users', users);
 app.use('/home', home);
+app.use('/connexion', connexion);
+app.use('/inscription', inscription);
 app.use('/root', root);
+
 ////// ALL TIME :P //////
 // catch 404 and forward to error handler
 

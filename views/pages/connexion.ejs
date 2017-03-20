@@ -1,0 +1,126 @@
+<% include header2 %>
+
+<div class="container text-center">
+		<h2>Connexion</h2>
+	<form>
+  <div id="resultat"></div>
+  		<div class="form-group">
+    		<label class="control-label col-sm-2" for="email">Email ou Pseudo:</label>
+          <div class="col-sm-10">
+      			<input type="text" class="form-control" id="email" placeholder="Enter email ou pseudo" >
+          </div>
+    	</div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="email">Password:</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" id="pwd" placeholder="Enter password" >
+          </div>
+      </div>
+  		</br>
+  		 <div class="form-group"> 
+    		<div class="col-sm-offset-2 col-sm-10">
+      			<button type="submit" id="connexion_form" class="btn btn-info">Envoyer</button>
+    		</div>
+    	</div>
+  	</form>
+  	<hr>
+    <div class="col-sm-6 col-sm-offset-3">
+    <p><a href="/home"><strong>home</strong></a></p>
+         <p><a href="/inscription"><strong>Pas encore inscrit?</strong></a></p>
+         <button type="button" class="btn btn-info" data-toggle="modal" data-target=".bd-example-modal-sm">j'ai oublié mon pwd</button>
+
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <forn>
+      <div id="resultatFrgtPwd"></div>
+      	<div class="form-group">
+        <label class="control-label col-sm-2" for="email">email:</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control" id="email_frgt" placeholder="Enter email" >
+          </div>
+      </div>
+      <div class="form-group"> 
+    		<div class="col-sm-offset-2 col-sm-10">
+      			<button type="submit" id="frgt_pwd_form" class="btn btn-info">Envoyer</button>
+    		</div>
+    	</div>
+      </forn>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<script>
+   $(function(){
+
+    var $email = $("#email"),
+        $pwd = $("#pwd");
+
+        $email.keyup(function(){
+
+
+        })
+
+
+    $("#connexion_form").click(function(e){
+       e.preventDefault();
+
+       let $email = $("#email").val(),
+        $pwd = $("#pwd").val();
+
+
+        if (check($email) &&
+            check($pwd)){
+          $.post(
+            'connexion/connexion',
+            {
+                email : $email,
+                pwd: $pwd,
+            },
+            function(data){
+              $("#resultat").html(data);
+            },
+            'text'
+         );
+
+        }
+        
+    });
+
+    $("#frgt_pwd_form").click(function(e){
+       e.preventDefault();
+
+       let $email = $("#email_frgt").val();
+
+        if (check($email)){
+          $.post(
+            'connexion/frgt_pwd',
+            {
+                email : $email,
+            },
+            function(data){
+              $("#resultatFrgtPwd").html(data);
+            },
+            'text'
+         );
+        }
+       });
+        
+
+    function check(champs){
+        if(champs == ""){ 
+          $("#resultat").html('un des champ est un complet');
+          return false;
+        } else return true;
+    }
+
+});
+</script>
+
+
+
+
+
+</body>
+</html>

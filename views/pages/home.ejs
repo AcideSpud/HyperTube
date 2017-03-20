@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html>
+<% include header2 %>
 
-	<% include header %>
-	<!-- Links CSS -->
-	<link rel="stylesheet" type="text/css" href="../../stylesheets/home.css">
-
-	
-	<body>
-	
 		<main class="wrapper">
-		<% include nav %>
+		
 
 		<div class="container">
 			<ul id="filmsList">
@@ -26,9 +18,8 @@
 			</ul>
 			
 		</div>			
-
-		<%	include footer %>
 		</main>
+
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
@@ -62,8 +53,4 @@
 		    	});
 		</script>
 
-
-
-	</body>
-
-</html>
+<%include footer %>
