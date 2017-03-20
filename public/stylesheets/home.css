@@ -40,3 +40,30 @@ footer {
   }
 
 }
+
+#filmsList {
+  margin-top: 15px;
+}
+
+.film {
+  display: inline-block;
+  top: 2%;
+  width: 24%;
+  margin: 5px;
+}
+
+.image-container{
+  height: 400px;
+  position: relative;
+}
+.image {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.text {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
