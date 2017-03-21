@@ -5,6 +5,7 @@ let async = require('async');
 //var Utilisateur = require('../models/utilisateur.js');
 var sanitizeHtml = require('sanitize-html');
 let bcrypt = require('bcryptjs');
+var mongoose = require('mongoose');
 
 router.use(bodyParser.urlencoded({ extended: false }));
 
@@ -17,12 +18,43 @@ router.post('/inscription', (req, res)=>{
 
 let mail = sanitizeHtml(req.body.email);
 let pseudo = sanitizeHtml(req.body.pseudo);
-let nom = sanitizeHtml(req.body.nom);
-let prenom = sanitizeHtml(req.body.prenom);
+//let nom = sanitizeHtml(req.body.nom);
+//let prenom = sanitizeHtml(req.body.prenom);
 let pawd = bcrypt.hashSync(req.body.pwd);
 let geo = JSON.parse(req.body.geo);
 
 let location = {lat: geo.lat, lon: geo.lon}
+
+var User_Schema = new mongoose.Schema({
+  			username : { type : String, match: /^[a-zA-Z0-9-_]+$/ },
+  			pwd : String,
+  			date : { type : Date, default : Date.now }
+});
+
+console.log('//////User_Schema/////')
+
+console.log(User_Schema);
+
+var UserModel = mongoose.model('NewUser', User_Schema)
+
+var NewUser = new UserModel({ username : pseudo, pwd : pawd});
+
+console.log('///////NEWUSER//////');
+console.log(NewUser);
+
+NewUser.save(function (err) {
+  if (err) { throw err; }
+  console.log('Commentaire ajouté avec succès !');
+  // On se déconnecte de MongoDB maintenant
+  mongoose.connection.close();
+});
+
+UserModel.find({ username: 'coucou' }, function (err, comms) {
+  if (err) { throw err; }
+  // comms est un tableau de hash
+  console.log(comms);
+});
+
 
 /*let user = {email: mail,
 			pseudo: pseudo,
