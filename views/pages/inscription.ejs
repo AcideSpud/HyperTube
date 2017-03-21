@@ -42,8 +42,6 @@
         $prenom = $("#prenom");
         $pwd = $("#pwd");
 
-   /*     
-    }*/
 
         $.getJSON("http://ip-api.com/json/?callback=?", function(data) {
           $("#geoResult").val(JSON.stringify(data));
