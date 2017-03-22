@@ -68,85 +68,37 @@ io.sockets.on('connection', function (socket) {
 
 
     socket.on('getFilmsList', function(data) {
+
+
       function getMovieDatas (torrentDatas, i) {
         var parsedDatas = tnp(torrentDatas[i].name)
-          // console.log(parsedDatas)
-          imdb.get(parsedDatas.title)
-              .then(movieDatas => {
-                  // console.log(movieDatas)
-                  torrentDatas[i].movieDatas = movieDatas
-                  // console.log(torrentDatas[i])
-                  // console.log(i+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                  i++
-                  if (i < torrentDatas.length) {
-                    getMovieDatas(torrentDatas, i)
-                  }
-                  else {
-                    console.log(torrentDatas)
-                    io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
-                  }
-                  
-                  // console.log(torrentDatas.movieDatas.title)
-                  // return (torrentDatas)
-              })
-              .catch(err => {
-                console.log(err)
-                i++
-                  if (i < torrentDatas.length) {
-                    getMovieDatas(torrentDatas, i)
-                  }
-                }
-              );
+        imdb.get(parsedDatas.title)
+          .then(movieDatas => {
+              torrentDatas[i].movieDatas = movieDatas
+              i++
+              if (i < torrentDatas.length) {
+                getMovieDatas(torrentDatas, i)
+              }
+              else {
+                io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
+              }
+          })
+          .catch(err => {
+            console.log(err)
+            i++
+            if (i < torrentDatas.length) {
+              getMovieDatas(torrentDatas, i)
+            }
+          })
       }
-        // var results = '';
-        PirateBay
-            .topTorrents(201)
-            .then(filmsList => {
-                // results = filmsList;
-
-                // console.log(filmsList[0])
-                // console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                var i = 0;
-                getMovieDatas(filmsList, i)
-                
-                
-
-                // for (var i = 0; i < filmsList.length; i++) {
-                //   var torrentDatas = tnp(filmsList[i].name)
-                //   console.log(torrentDatas)
-                  // imdb.get(torrentDatas.title)
-                  //     .then(movieDatas => {
-                  //       console.log("NUMERO: "+i)
-                  //         // console.log(movieDatas)
-                  //         filmsList[i].movieDatas = movieDatas
-                  //         // console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                  //         // console.log(filmsList[i])
-                  //         // console.log(filmsList[i].movieDatas.title)
-
-                  //         // if (i = (filmsList.length - 1)) {
-                  //         // }
-                  //     })
-                  //     .catch(err => console.log(err))
-                // }
-
-
-                // var torrentDatas = tnp(filmsList[0].name)
-                // console.log(torrentDatas)
-                // imdb.get(torrentDatas.title)
-                //     .then(movieDatas => {
-                //         console.log(movieDatas)
-                //         filmsList[0].movieDatas = movieDatas
-                //         console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                //         console.log(filmsList[0])
-                //         console.log(filmsList[0].movieDatas.title)
-
-                //         // if (i = (filmsList.length - 1)) {
-                //         //  io.to(data.id).emit('browseFilmsList', {filmsList: filmsList})
-                //         // }
-                //     })
-                //     .catch(err => console.log(err))
-            })
-            .catch(err => console.log(err));
+      
+      var i = 0
+      PirateBay
+          .topTorrents(201)
+          .then(filmsList => {   
+            getMovieDatas(filmsList, i)
+          })
+          .catch(err => console.log(err))
     });
 
 });

@@ -9,12 +9,12 @@
     <hr>
     <div>
       	<a href="/inscription">
-      		<button type="button" class="btn btn-info">inscription</button>
+      		<button type="button" class="btn btn-info">Inscription</button>
       	</a>
     </div>
     <hr>
     <div>
-      	<a href="/Home">
+      	<a href="/home">
       		<button type="button" class="btn btn-info">Home</button>
       	</a>
     </div>
@@ -37,16 +37,7 @@
 
 				var socket = io.connect('http://localhost:8080');
 		    	socket.on('connect', function() {
-			        socket.emit('getFilmsList', {id: socket.id});
-
-			        socket.on('browseFilmsList', function(data){
-						var filmsList = data.filmsList;
-						for (var i = 0; i < filmsList.length; i++) {
-							var film = document.createElement('li');
-							film.textContent = filmsList[i].name;
-							$('#filmsList').append(film);
-						}
-					});
+			        
 		    	});
 		</script>
 
