@@ -43,6 +43,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 let db = mongoose.connect('mongodb://localhost/HyperTube', (err)=> {
   if (err) {throw err}
 });

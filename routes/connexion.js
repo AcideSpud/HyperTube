@@ -7,6 +7,7 @@ var sanitizeHtml = require('sanitize-html');
 let bcrypt = require('bcryptjs');
 let nodemailer = require('nodemailer');
 
+
 router.use(bodyParser.urlencoded({ extended: false }));
 
 String.prototype.shuffle = function (){
@@ -31,6 +32,9 @@ function requireLogin (req, res, next) {
 };
 
 router.get('/', function(req, res, next) {
+	console.log('///////////////////REQ.DB/////////////')
+	console.log(req.db);
+	console.log('///////////////////////////////')
   res.render('pages/connexion', {});
   next();
 });
@@ -41,6 +45,8 @@ let email = sanitizeHtml(req.body.email);
 let pwd = req.body.pwd;
 
 console.log('email: ', email, 'pwd: ', pwd);
+
+
 
 /*async.waterfall([
 	function findUser(callback){
