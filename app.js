@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 
 // Les middlewares de l'app
@@ -18,6 +19,8 @@ var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
 var imdb = require('imdb-api');
 var mongoose = require('mongoose');
+var configDB = require('./config/database.js');
+var passport = require('passport');
 
 //// require ROUTES ! /////
 var index = require('./routes/index');
@@ -41,7 +44,17 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({ secret: "anystringoftext",
+                  saveUninitialized: true,
+                  resave: true}))
+
+app.use(passport.initialize());
+app.use(passport.session()).
+app.use(flash());
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+
 
 
 let db = mongoose.connect('mongodb://localhost/HyperTube', (err)=> {
