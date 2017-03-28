@@ -30,6 +30,9 @@ var home = require('./routes/home');
 var inscription = require('./routes/inscription');
 var connexion = require('./routes/connexion');
 
+//MODEL
+var UserModel = require("./models/userModel.js").UserModel;
+
 
 
 var app = express();
@@ -44,13 +47,41 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(session({ secret: "anystringoftext",
-                  saveUninitialized: true,
-                  resave: true}))
 
-app.use(passport.initialize());
-app.use(passport.session()).
-app.use(flash());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
+
+app.use((req, res, next)=>{
+  console.log('ahahah');
+  if (req.session && req.session.user){
+    console.log('regiSTRATOR')
+
+    UserModel.find({username : req.session.user.pseudo}, (err, result)=>{
+      if (err){
+        console.log(err)
+      }else{
+        if (result[0])
+        {
+          req.user = result[0];
+          delete req.user.pwd;
+          req.session.user = result[0];
+          res.locals.user = result[0];
+
+        } else{
+
+        }
+        next();
+      }
+    })
+  } else{
+    next();
+  }
+})
 
 app.use(express.static(path.join(__dirname, 'public')));
 
