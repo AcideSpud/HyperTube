@@ -23,43 +23,72 @@
 		</main>
 
 
-		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
 
 				var socket = io.connect('http://localhost:8080');
 		    	socket.on('connect', function() {
+		    		console.log("YO")
 			        socket.emit('getFilmsList', {id: socket.id});
 
 			        socket.on('browseFilmsList', function(data){
+		    			console.log("YEAH")
 						var filmsList = data.filmsList;
-						for (var i = 0; i < filmsList.length; i++) {
-							if (filmsList[i].movieDatas) {
-								var poster = filmsList[i].movieDatas.poster;
-								if ((poster.slice(0, 4) == "http")) {
-									if (i === 0) {
-										// $("#film").find('.image').attr('src', filmsList[i].movieDatas.poster);
-										$("#film").find('.image-container').css('backgroundImage', 'url("'+filmsList[i].movieDatas.poster+'")');
-										$("#film").find('.image-container').css('background-repeat', 'round');
-										$("#film").find('span').text(filmsList[i].movieDatas.title);
-										$('#filmsList').append($("#film"));
-									}
-									else {
-										var clone = $("#film").clone();
-										// clone.find('.image').attr('src', filmsList[i].movieDatas.poster);
-										clone.find('.image-container').css('backgroundImage', 'url("'+filmsList[i].movieDatas.poster+'")');
-										clone.find('.image-container').css('background-repeat', 'round');
-										clone.find('span').text(filmsList[i].movieDatas.title);
-										$('#filmsList').append(clone);
-									}
+						console.log(filmsList.length)
+
+						if (filmsList.movieDatas) {
+							var poster = filmsList.movieDatas.poster;
+							if ((poster.slice(0, 4) == "http")) {
+								if ($("#film").find('span').text() == '') {
+									$("#film").find('.image-container').css('backgroundImage', 'url("'+filmsList.movieDatas.poster+'")');
+									$("#film").find('.image-container').css('background-repeat', 'round');
+									$("#film").find('span').text(filmsList.movieDatas.title);
+									$('#filmsList').append($("#film"));
 								}
 								else {
-									console.log("NOPIC: "+filmsList[i].movieDatas.title)
+									var clone = $("#film").clone();
+									clone.find('.image-container').css('backgroundImage', 'url("'+filmsList.movieDatas.poster+'")');
+									clone.find('.image-container').css('background-repeat', 'round');
+									clone.find('span').text(filmsList.movieDatas.title);
+									$('#filmsList').append(clone);
 								}
 							}
 							else {
-								console.log("NOIMDB: "+filmsList[i].name)
+								console.log("NOPIC: "+filmsList.movieDatas.title)
 							}
 						}
+						else {
+							console.log("NOIMDB: "+filmsList.name)
+						}
+
+
+						// for (var i = 0; i < filmsList.length; i++) {
+						// 	if (filmsList[i].movieDatas) {
+						// 		var poster = filmsList[i].movieDatas.poster;
+						// 		if ((poster.slice(0, 4) == "http")) {
+						// 			if (i === 0) {
+						// 				// $("#film").find('.image').attr('src', filmsList[i].movieDatas.poster);
+						// 				$("#film").find('.image-container').css('backgroundImage', 'url("'+filmsList[i].movieDatas.poster+'")');
+						// 				$("#film").find('.image-container').css('background-repeat', 'round');
+						// 				$("#film").find('span').text(filmsList[i].movieDatas.title);
+						// 				$('#filmsList').append($("#film"));
+						// 			}
+						// 			else {
+						// 				var clone = $("#film").clone();
+						// 				// clone.find('.image').attr('src', filmsList[i].movieDatas.poster);
+						// 				clone.find('.image-container').css('backgroundImage', 'url("'+filmsList[i].movieDatas.poster+'")');
+						// 				clone.find('.image-container').css('background-repeat', 'round');
+						// 				clone.find('span').text(filmsList[i].movieDatas.title);
+						// 				$('#filmsList').append(clone);
+						// 			}
+						// 		}
+						// 		else {
+						// 			console.log("NOPIC: "+filmsList[i].movieDatas.title)
+						// 		}
+						// 	}
+						// 	else {
+						// 		console.log("NOIMDB: "+filmsList[i].name)
+						// 	}
+						// }
 					});
 		    	});
 		</script>
