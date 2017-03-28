@@ -61,7 +61,7 @@ app.use((req, res, next)=>{
   if (req.session && req.session.user){
     console.log('regiSTRATOR')
 
-    UserModel.find({username : req.session.user.pseudo}, (err, result)=>{
+    UserModel.find({username : req.session.user.username}, (err, result)=>{
       if (err){
         console.log(err)
       }else{

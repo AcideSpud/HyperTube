@@ -59,7 +59,7 @@ async.waterfall([
 				return callback(null, UserByMail);
 			});
 		else
-			UserModel.find({username : username}, (err, UserByPseudo)=>{
+			UserModel.find({username : email}, (err, UserByPseudo)=>{
 			if (err) return callback(err)
 			console.log('USERBYPSEUDO: ',UserByPseudo);
 			return callback(null, UserByPseudo);
@@ -69,6 +69,7 @@ async.waterfall([
 		if (user && user[0]){
 			if (bcrypt.compareSync(pwd, user[0].pwd)){
 				req.session.user = user[0];
+				console.log('REGISTER USER: REQ>SESSION>USER: ', req.session.user.username)
 				return callback(null, 'Vous etes bien authentifié')
 			} else return callback('un mauvais mdp')
 		} else return callback('mauvais pseudo ou email/')

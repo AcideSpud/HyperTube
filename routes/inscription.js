@@ -9,9 +9,8 @@ let bcrypt = require('bcryptjs');
 var UserModel = require("../models/userModel.js").UserModel;
 //
 
-
-
 router.use(bodyParser.urlencoded({ extended: false }));
+
 
 router.get('/', function(req, res, next) {
   res.render('pages/inscription', {});
