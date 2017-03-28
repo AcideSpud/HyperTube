@@ -5,6 +5,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 
 // Les middlewares de l'app
@@ -25,6 +26,8 @@ var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
 var imdb = require('imdb-api');
 var mongoose = require('mongoose');
+var configDB = require('./config/database.js');
+var passport = require('passport');
 
 //// require ROUTES ! /////
 var index = require('./routes/index');
@@ -33,6 +36,9 @@ var root = require('./routes/root');
 var home = require('./routes/home');
 var inscription = require('./routes/inscription');
 var connexion = require('./routes/connexion');
+
+//MODEL
+var UserModel = require("./models/userModel.js").UserModel;
 
 
 
@@ -48,7 +54,45 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
+
+app.use((req, res, next)=>{
+  console.log('ahahah');
+  if (req.session && req.session.user){
+    console.log('regiSTRATOR')
+
+    UserModel.find({username : req.session.user.pseudo}, (err, result)=>{
+      if (err){
+        console.log(err)
+      }else{
+        if (result[0])
+        {
+          req.user = result[0];
+          delete req.user.pwd;
+          req.session.user = result[0];
+          res.locals.user = result[0];
+
+        } else{
+
+        }
+        next();
+      }
+    })
+  } else{
+    next();
+  }
+})
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+
 
 
 let db = mongoose.connect('mongodb://localhost/HyperTube', (err)=> {

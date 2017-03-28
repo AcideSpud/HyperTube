@@ -7,6 +7,8 @@ var sanitizeHtml = require('sanitize-html');
 let bcrypt = require('bcryptjs');
 let nodemailer = require('nodemailer');
 
+var UserModel = require("../models/userModel.js").UserModel;
+
 
 router.use(bodyParser.urlencoded({ extended: false }));
 
@@ -48,16 +50,16 @@ console.log('email: ', email, 'pwd: ', pwd);
 
 
 
-/*async.waterfall([
+async.waterfall([
 	function findUser(callback){
 		if (email.match(/[@]/))
-			Utilisateur.queryByMail(email, (UserByMail, err)=>{
+			UserModel.find({mail : email}, (err, UserByMail)=>{
 				if (err) return callback(err);
 				console.log('USERBYMAIL:', UserByMail)
 				return callback(null, UserByMail);
 			});
 		else
-			Utilisateur.queryByPseudo(email, (UserByPseudo, err)=>{
+			UserModel.find({username : username}, (err, UserByPseudo)=>{
 			if (err) return callback(err)
 			console.log('USERBYPSEUDO: ',UserByPseudo);
 			return callback(null, UserByPseudo);
@@ -75,7 +77,7 @@ console.log('email: ', email, 'pwd: ', pwd);
 	], (err, resultFinal)=>{
 		if (err) return res.status(200).send(err);
 		else return res.status(200).send(resultFinal);
-	});*/
+	});
 
 });
 
@@ -139,7 +141,7 @@ router.post('/frgt_pwd', (req, res)=>{
 
 router.get('/logout', requireLogin, (req, res)=>{
 
-	/*req.session.destroy((err)=> {
+	req.session.destroy((err)=> {
             if (err) {
              throw err
             }
@@ -148,7 +150,7 @@ router.get('/logout', requireLogin, (req, res)=>{
                 res.redirect('/')
             }
          });
-         */
+        
 })
 
 
