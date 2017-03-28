@@ -1,3 +1,4 @@
+var https = require('https');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -14,6 +15,12 @@ var fs = require('fs');
 var crypto = require('crypto');
 var htmlspecialchars = require('htmlspecialchars');
 
+
+const ExtraTorrentAPI = require('extratorrent-api').Website;
+const extraTorrentAPI = new ExtraTorrentAPI();
+
+// const KAT = require('kat-api-pt'); 
+// const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
 var imdb = require('imdb-api');
@@ -71,36 +78,162 @@ io.sockets.on('connection', function (socket) {
     socket.on('getFilmsList', function(data) {
 
 
-      function getMovieDatas (torrentDatas, i) {
-        var parsedDatas = tnp(torrentDatas[i].name)
-        imdb.get(parsedDatas.title)
-          .then(movieDatas => {
-              torrentDatas[i].movieDatas = movieDatas
+      function getMovieDatas (torrentDatas, i, list) {
+        console.log(i)
+        if (torrentDatas[i].name) {
+          var parsedDatas = tnp(torrentDatas[i].name)
+        }
+        else {
+          var parsedDatas = tnp(torrentDatas[i].title)
+        }
+        var inList = "n"
+        for (var x = 0; x < list.length; x++) {
+          if (list[x] == parsedDatas.title) {
+            console.log(parsedDatas.title)
+            inList = "y"
+          }
+        }
+        if (inList == "n") {
+          list.push(parsedDatas.title)
+          imdb.get(parsedDatas.title)
+            .then(movieDatas => {
+                torrentDatas[i].movieDatas = movieDatas
+                io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[i]})
+                i++
+                if (i < torrentDatas.length) {
+                  getMovieDatas(torrentDatas, i, list)
+                }
+                if (torrentDatas.page && (torrentDatas.page < torrentDatas.total_pages)) {
+                    extraTorrentAPI.search({
+                    with_words: 'hd',
+                    page: torrentDatas.page + 1,
+                    seeds_from: 100,
+                    category: 'movies',
+                    added: 7,
+                  }).then(filmsList => {
+                      // console.log(filmsList)
+                      var j = 0
+                      getMovieDatas(filmsList.results, j, list)
+                    })
+                    .catch(err => console.error(err));
+                }
+                // else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
+                //   console.log("INLIST=NO "+list)
+                //   io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
+                // }
+            })
+            .catch(err => {
+              console.log(err)
               i++
               if (i < torrentDatas.length) {
-                getMovieDatas(torrentDatas, i)
+                getMovieDatas(torrentDatas, i, list)
               }
-              else {
-                io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
+              if (torrentDatas.page && (torrentDatas.page < torrentDatas.total_pages)) {
+                  extraTorrentAPI.search({
+                  with_words: 'hd',
+                  page: torrentDatas.page + 1,
+                  seeds_from: 100,
+                  category: 'movies',
+                  added: 7,
+                }).then(filmsList => {
+                    // console.log(filmsList)
+                    var j = 0
+                    getMovieDatas(filmsList.results, j, list)
+                  })
+                  .catch(err => console.error(err));
               }
-          })
-          .catch(err => {
-            console.log(err)
-            i++
-            if (i < torrentDatas.length) {
-              getMovieDatas(torrentDatas, i)
-            }
-          })
+              // else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
+              //   console.log("ERROR "+list)
+              //   io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
+              // }
+            })
+        }
+        else {
+          i++
+          if (i < torrentDatas.length) {
+            getMovieDatas(torrentDatas, i, list)
+          }
+          if (torrentDatas.page && (torrentDatas.page < torrentDatas.total_pages)) {
+              extraTorrentAPI.search({
+              with_words: 'hd',
+              page: torrentDatas.page + 1,
+              seeds_from: 100,
+              category: 'movies',
+              added: 7,
+            }).then(filmsList => {
+                // console.log(filmsList)
+                var j = 0
+                getMovieDatas(filmsList.results, j, list)
+              })
+              .catch(err => console.error(err));
+          }
+          // else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
+          //   console.log("INLIST=YES "+list)
+          //   io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
+          // }
+        }
       }
-      
-      var i = 0
+
+      extraTorrentAPI.search({
+        with_words: 'hd',
+        page: 1,
+        // seeds_from: 50,
+        leechers_from: 50,
+        category: 'movies',
+        added: 7,
+      }).then(filmsList => {
+          // console.log(filmsList)
+          var list = []
+          var i = 0
+          getMovieDatas(filmsList.results, i, list)
+        })
+        .catch(err => console.error(err));
+
       PirateBay
           .topTorrents(201)
-          .then(filmsList => {   
-            getMovieDatas(filmsList, i)
+          .then(filmsList => {
+            var list = []
+            var i = 0
+            getMovieDatas(filmsList, i, list)
           })
           .catch(err => console.log(err))
     });
+
+
+
+      // kat.search({
+      //   category: 'movies',
+      //   page: 10,
+      //   sort_by: 'seeders',
+      //   order: 'desc',
+      //   language: 'english'
+      // }).then(filmsList => console.log(filmsList))
+      //   .catch(err => console.error(err));
+
+      // var options = {
+      //   limit: 100,
+      //   order: 'latest',
+      //   filter: 'video'
+      // }
+      // tp.search('', options, (err, filmsList) => {
+      //   if (err) console.log(err)
+      //   console.log(filmsList)
+      // })
+
+      // var request = https.get("https://yts.ag/api/v2/list_movies.json?sort=download_count&limit=1", (response => {
+      //   response.setEncoding("utf-8");
+      //   // var fichier = fs.createWriteStream("result.txt")
+      //   // response.pipe(fichier)
+      //   response.on("data", (filmsList => {
+      //     console.log(filmsList.status)
+      //   }))
+
+      // }))
+      // request.on("error", function(e) {
+      //   console.log("Erreur de http.get() : "+e.message)
+      // })
+      // request.end()
+      
 
 });
 
