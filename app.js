@@ -20,7 +20,7 @@ var htmlspecialchars = require('htmlspecialchars');
 const ExtraTorrentAPI = require('extratorrent-api').Website;
 const extraTorrentAPI = new ExtraTorrentAPI();
 
-// const KAT = require('kat-api-pt'); 
+// const KAT = require('kat-api-pt'); ™
 // const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
@@ -68,7 +68,7 @@ app.use((req, res, next)=>{
   if (req.session && req.session.user){
     console.log('regiSTRATOR')
 
-    UserModel.find({username : req.session.user.pseudo}, (err, result)=>{
+    UserModel.find({username : req.session.user.username}, (err, result)=>{
       if (err){
         console.log(err)
       }else{

@@ -34,9 +34,6 @@ function requireLogin (req, res, next) {
 };
 
 router.get('/', function(req, res, next) {
-	console.log('///////////////////REQ.DB/////////////')
-	console.log(req.db);
-	console.log('///////////////////////////////')
   res.render('pages/connexion', {});
   next();
 });
@@ -59,7 +56,7 @@ async.waterfall([
 				return callback(null, UserByMail);
 			});
 		else
-			UserModel.find({username : username}, (err, UserByPseudo)=>{
+			UserModel.find({username : email}, (err, UserByPseudo)=>{
 			if (err) return callback(err)
 			console.log('USERBYPSEUDO: ',UserByPseudo);
 			return callback(null, UserByPseudo);
@@ -69,6 +66,7 @@ async.waterfall([
 		if (user && user[0]){
 			if (bcrypt.compareSync(pwd, user[0].pwd)){
 				req.session.user = user[0];
+				console.log('REGISTER USER: REQ>SESSION>USER: ', req.session.user.username)
 				return callback(null, 'Vous etes bien authentifié')
 			} else return callback('un mauvais mdp')
 		} else return callback('mauvais pseudo ou email/')
@@ -87,24 +85,26 @@ router.post('/frgt_pwd', (req, res)=>{
 
 	let email = sanitizeHtml(req.body.email);
 
-	/*async.waterfall([
+	async.waterfall([
 		function findUser(callback){
-			Utilisateur.queryByMail(email, (UserByMail, err)=>{
-				if (err) return callback(err);
-				console.log('USERBYMAIL:', UserByMail)
-				return callback(null, UserByMail);
-			});
+			UserModel.find({mail : email}, (err, query)=>{
+			if (err) return callback(err);
+			else return callback(null, query);
+			})
 		},
 		function changePwd(user, callback){
-			if (user && user[0])
-
-				Utilisateur.changePwd(user[0].pseudo, null, (newpass, err)=>{
-					return callback(null, newpass, user);
-				})
+			if (user && user[0]){
+  					var newpass = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".shuffle();
+  					var query = {username: user[0].username};
+					UserModel.findOneAndUpdate(query, {pwd: bcrypt.hashSync(newpass)},  (err, query)=>{
+						if (err) return callback(err);
+						console.log('USER AFTER UPDATE, ', query);
+  	  					return callback(null, newpass, query);
+					})
+			}
 			else return callback('l\'utilisateur n\'existe pas');
 		},
 		function sendMail(newpass, user, callback){
-
 
 			var transporter = nodemailer.createTransport({
 					service: 'Gmail',
@@ -117,8 +117,8 @@ router.post('/frgt_pwd', (req, res)=>{
 				var textLink = "http://" + req.headers.host;
 
 				var mailOptions ={
-					from: 'Matcha 42 <matcha42matcha@gmail.com>',
-					to: user[0].email,
+					from: 'Hypertuve <hypertube42hypertube@gmail.com>',
+					to: user.mail,
 					subject: 'forgot mdp',
 					generateTextFromHTML: true,
 					html:'<p>votre nouveau pwd: </p></br>' + newpass + '</br><a href=\"'+ textLink.toString() + '\"> </br>Click here to activate your account.</a>'
@@ -135,7 +135,7 @@ router.post('/frgt_pwd', (req, res)=>{
 			if (err) return res.status(200).send(err);
 			else return res.status(200).send(resultFinal);
 		});
-		*/
+		
 
 })
 
