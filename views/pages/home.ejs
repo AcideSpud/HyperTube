@@ -4,18 +4,18 @@
 		
 
 		<div class="container">
-			<ul id="filmsList">
+			<div id="filmsList">
 				<div class="film" id="film">
-					<li>
+					<!-- <li> -->
 						<div class="image-container">
 							<!-- <img class="image" src=""/> -->
 							<div class="text">
 								<span class="title"></span>
 							</div>
 						</div>
-					</li>	
+					<!-- </li>	 -->
 				</div>	
-			</ul>
+			</div>
 			
 		</div>			
 		</main>
@@ -57,6 +57,25 @@
 						else {
 							console.log("NOIMDB: "+filmsList.name)
 						}
+
+						$(document).ready(function() {
+							var win = $(window);
+							win.data('ajaxready', true);
+							// $('#filmsList').append('<div id="loader"><img src="/img/ajax-loader.gif" alt="loader ajax"></div>');
+
+							// Each time the user scrolls
+							win.scroll(function() {
+								if (win.data('ajaxready') == false) return;
+								// End of the document reached?
+								if ($(document).height() - win.height() == win.scrollTop()) {
+									win.data('ajaxready', false);
+									$('#filmsList #loader').fadeIn(400);
+									socket.emit('getMoreFilms', {id: socket.id});
+
+									
+								}
+							});
+						});
 
 
 						// for (var i = 0; i < filmsList.length; i++) {

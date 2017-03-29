@@ -119,6 +119,20 @@ var io = require('socket.io').listen(server);
 io.sockets.on('connection', function (socket) {
 
 
+    socket.on('getMoreFilms', function(data) {
+      // console.log("ENCORE!")
+      // console.log(socket.filmsIndex)
+      // io.to(data.id).emit('browseMoreFilms', {filmsList: socket.filmsIndex})
+
+      for (var i = socket.filmsIndex; i < socket.filmsIndex + 12; i++) {
+        if (i < socket.filmsListLength) {
+          io.to(data.id).emit('browseFilmsList', {filmsList: socket.filmsList[i]})
+        }
+      }
+      socket.filmsIndex = socket.filmsIndex + 12
+    })
+
+
     socket.on('getFilmsList', function(data) {
 
 
@@ -141,8 +155,11 @@ io.sockets.on('connection', function (socket) {
           list.push(parsedDatas.title)
           imdb.get(parsedDatas.title)
             .then(movieDatas => {
+                // console.log(torrentDatas[i])
                 torrentDatas[i].movieDatas = movieDatas
-                io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[i]})
+                if (i < 12) {
+                  io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[i]})
+                }
                 i++
                 if (i < torrentDatas.length) {
                   getMovieDatas(torrentDatas, i, list)
@@ -161,10 +178,13 @@ io.sockets.on('connection', function (socket) {
                     })
                     .catch(err => console.error(err));
                 }
-                // else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
-                //   console.log("INLIST=NO "+list)
-                //   io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
-                // }
+                else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
+                  // for (var x = 0; x < socket.filmsIndex; x++) {
+                    socket.filmsList = torrentDatas
+                    socket.filmsListLength = torrentDatas.length
+                    // io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[x]})
+                  // }
+                }
             })
             .catch(err => {
               console.log(err)
@@ -186,10 +206,13 @@ io.sockets.on('connection', function (socket) {
                   })
                   .catch(err => console.error(err));
               }
-              // else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
-              //   console.log("ERROR "+list)
-              //   io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
-              // }
+              else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
+                // for (var x = 0; x < socket.filmsIndex; x++) {
+                  socket.filmsList = torrentDatas
+                  socket.filmsListLength = torrentDatas.length
+                  // io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[x]})
+                // }
+              }
             })
         }
         else {
@@ -211,74 +234,41 @@ io.sockets.on('connection', function (socket) {
               })
               .catch(err => console.error(err));
           }
-          // else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
-          //   console.log("INLIST=YES "+list)
-          //   io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas})
-          // }
+          else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
+            // for (var x = 0; x < socket.filmsIndex; x++) {
+              socket.filmsList = torrentDatas
+              socket.filmsListLength = torrentDatas.length
+              // io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[x]})
+            // }
+          }
         }
       }
 
       extraTorrentAPI.search({
         with_words: 'hd',
         page: 1,
-        // seeds_from: 50,
+        seeds_from: 50,
         leechers_from: 50,
         category: 'movies',
-        added: 7,
+        added: 7
       }).then(filmsList => {
-          // console.log(filmsList)
+          console.log(filmsList)
           var list = []
           var i = 0
           getMovieDatas(filmsList.results, i, list)
         })
         .catch(err => console.error(err));
 
-      PirateBay
-          .topTorrents(201)
-          .then(filmsList => {
-            var list = []
-            var i = 0
-            getMovieDatas(filmsList, i, list)
-          })
-          .catch(err => console.log(err))
+        socket.filmsIndex = 12;
+        PirateBay
+            .topTorrents(201)
+            .then(filmsList => {
+              var list = []
+              var i = 0
+              getMovieDatas(filmsList, i, list)
+            })
+            .catch(err => console.log(err))
     });
-
-
-
-      // kat.search({
-      //   category: 'movies',
-      //   page: 10,
-      //   sort_by: 'seeders',
-      //   order: 'desc',
-      //   language: 'english'
-      // }).then(filmsList => console.log(filmsList))
-      //   .catch(err => console.error(err));
-
-      // var options = {
-      //   limit: 100,
-      //   order: 'latest',
-      //   filter: 'video'
-      // }
-      // tp.search('', options, (err, filmsList) => {
-      //   if (err) console.log(err)
-      //   console.log(filmsList)
-      // })
-
-      // var request = https.get("https://yts.ag/api/v2/list_movies.json?sort=download_count&limit=1", (response => {
-      //   response.setEncoding("utf-8");
-      //   // var fichier = fs.createWriteStream("result.txt")
-      //   // response.pipe(fichier)
-      //   response.on("data", (filmsList => {
-      //     console.log(filmsList.status)
-      //   }))
-
-      // }))
-      // request.on("error", function(e) {
-      //   console.log("Erreur de http.get() : "+e.message)
-      // })
-      // request.end()
-      
-
 });
 
 
