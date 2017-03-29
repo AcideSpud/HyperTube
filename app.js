@@ -20,7 +20,7 @@ var htmlspecialchars = require('htmlspecialchars');
 const ExtraTorrentAPI = require('extratorrent-api').Website;
 const extraTorrentAPI = new ExtraTorrentAPI();
 
-// const KAT = require('kat-api-pt'); 
+// const KAT = require('kat-api-pt'); ™
 // const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
