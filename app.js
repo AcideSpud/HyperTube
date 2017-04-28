@@ -1,4 +1,5 @@
 var https = require('https');
+var request = require('request');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -20,7 +21,7 @@ var htmlspecialchars = require('htmlspecialchars');
 const ExtraTorrentAPI = require('extratorrent-api').Website;
 const extraTorrentAPI = new ExtraTorrentAPI();
 
-// const KAT = require('kat-api-pt'); ™
+// const KAT = require('kat-api-pt'); 
 // const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
@@ -116,160 +117,323 @@ app.use('/root', root);
 
 //Le système de navigation via socket
 var io = require('socket.io').listen(server);
+
 io.sockets.on('connection', function (socket) {
 
+  socket.on('getDatSort', (data) => {
 
-    socket.on('getMoreFilms', function(data) {
-      // console.log("ENCORE!")
-      // console.log(socket.filmsIndex)
-      // io.to(data.id).emit('browseMoreFilms', {filmsList: socket.filmsIndex})
-
-      for (var i = socket.filmsIndex; i < socket.filmsIndex + 12; i++) {
-        if (i < socket.filmsListLength) {
-          io.to(data.id).emit('browseFilmsList', {filmsList: socket.filmsList[i]})
+    function firstRow(sortedList) {
+      var j = 0
+      var k = 0
+      var length = sortedList.length
+      while ((j < length) && (k < 8)) {
+        if (sortedList[j] && sortedList[j].movieDatas && (sortedList[j].movieDatas.poster.slice(0, 4) == "http") && ((j === 0) || (sortedList[j].movieDatas.title != sortedList[j - 1].movieDatas.title))) {
+          io.to(data.id).emit('browseFilmsList', {filmsList: sortedList[j]})
+          k++
         }
+        j++
       }
-      socket.filmsIndex = socket.filmsIndex + 12
+    }
+
+    var getTitleAscSort = new Promise((resolve, reject) => {
+      socket.filmsList.sort()
+      console.log("in getTitleAscSort: "+socket.filmsList[0].title)
+      resolve(socket.filmsList)
+      if (!socket.filmsList) {
+        reject('socket.filmsList vide!')
+      }
     })
 
+    var getTitleDescSort = new Promise((resolve, reject) => {
+      socket.filmsList.reverse()
+      console.log("in getTitleDescSort: "+socket.filmsList[0].title)
+      resolve(socket.filmsList)
+      if (!socket.filmsList) {
+        reject('socket.filmsList vide!')
+      }
+    })
 
-    socket.on('getFilmsList', function(data) {
+    console.log(data)
+
+    if (data.sort == "title-asc") {
+      getTitleAscSort.then((filmsList) => {
+        console.log("after getTitleAscSort: "+socket.filmsList[0].title)
+        firstRow(socket.filmsList)
+      })
+      .catch(err => console.log(err))
+    }
+    else if (data.sort == "title-desc") {
+       getTitleDescSort.then((filmsList) => {
+        console.log("after getTitleDescSort: "+socket.filmsList[0].title)
+        firstRow(socket.filmsList)
+      })
+      .catch(err => console.log(err))
+    }
+
+    // io.to(data.id).emit('setUpdate', {filmsList: socket.filmsList})
+  })
+    
+  socket.on('getMoreFilms', (data) => {
+    console.log("ENCORE!")
+
+    var k = 0
+    var j = socket.filmsIndex
+    while ((j < socket.filmsListLength) && (k < 4)) {
+      if (socket.filmsList[j] && socket.filmsList[j].movieDatas && (socket.filmsList[j].movieDatas.poster.slice(0, 4) == "http") && (socket.filmsList[j].movieDatas.title != socket.filmsList[j - 1].movieDatas.title)) {
+        io.to(data.id).emit('browseFilmsList', {filmsList: socket.filmsList[j]})
+        k++
+      }
+      j++
+    }
+    socket.filmsIndex = j
+  })
 
 
-      function getMovieDatas (torrentDatas, i, list) {
-        console.log(i)
-        if (torrentDatas[i].name) {
-          var parsedDatas = tnp(torrentDatas[i].name)
-        }
-        else {
-          var parsedDatas = tnp(torrentDatas[i].title)
-        }
-        var inList = "n"
-        for (var x = 0; x < list.length; x++) {
-          if (list[x] == parsedDatas.title) {
-            console.log(parsedDatas.title)
-            inList = "y"
+  socket.on('getFilmsList', function(data) {
+
+    // Initialisation des variables
+    if (data.title) {
+      var title = htmlspecialchars(data.title)
+      console.log("\nTITRE DEMANDÉ: "+title+"\n")
+    }
+    socket.filmsIndex = 8
+    socket.filmsList = []
+    socket.filmsListLength = 0
+    var list = []
+
+
+    // Les fonctions
+    function sortList(filmsList, callback){
+      for (var m = 0; m < (filmsList.length - 1); m++) {
+        for (var n = (filmsList.length - 1); n; n--) {
+          if (filmsList[m].title > filmsList[m + 1].title) {
+            var temp = filmsList[m]
+            filmsList[m] = filmsList[m + 1]
+            filmsList[m + 1] = temp
+            temp = ''
+            m = 0
           }
-        }
-        if (inList == "n") {
-          list.push(parsedDatas.title)
-          imdb.get(parsedDatas.title)
-            .then(movieDatas => {
-                // console.log(torrentDatas[i])
-                torrentDatas[i].movieDatas = movieDatas
-                if (i < 12) {
-                  io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[i]})
-                }
-                i++
-                if (i < torrentDatas.length) {
-                  getMovieDatas(torrentDatas, i, list)
-                }
-                if (torrentDatas.page && (torrentDatas.page < torrentDatas.total_pages)) {
-                    extraTorrentAPI.search({
-                    with_words: 'hd',
-                    page: torrentDatas.page + 1,
-                    seeds_from: 100,
-                    category: 'movies',
-                    added: 7,
-                  }).then(filmsList => {
-                      // console.log(filmsList)
-                      var j = 0
-                      getMovieDatas(filmsList.results, j, list)
-                    })
-                    .catch(err => console.error(err));
-                }
-                else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
-                  // for (var x = 0; x < socket.filmsIndex; x++) {
-                    socket.filmsList = torrentDatas
-                    socket.filmsListLength = torrentDatas.length
-                    // io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[x]})
-                  // }
-                }
-            })
-            .catch(err => {
-              console.log(err)
-              i++
-              if (i < torrentDatas.length) {
-                getMovieDatas(torrentDatas, i, list)
-              }
-              if (torrentDatas.page && (torrentDatas.page < torrentDatas.total_pages)) {
-                  extraTorrentAPI.search({
-                  with_words: 'hd',
-                  page: torrentDatas.page + 1,
-                  seeds_from: 100,
-                  category: 'movies',
-                  added: 7,
-                }).then(filmsList => {
-                    // console.log(filmsList)
-                    var j = 0
-                    getMovieDatas(filmsList.results, j, list)
-                  })
-                  .catch(err => console.error(err));
-              }
-              else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
-                // for (var x = 0; x < socket.filmsIndex; x++) {
-                  socket.filmsList = torrentDatas
-                  socket.filmsListLength = torrentDatas.length
-                  // io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[x]})
-                // }
-              }
-            })
-        }
-        else {
-          i++
-          if (i < torrentDatas.length) {
-            getMovieDatas(torrentDatas, i, list)
-          }
-          if (torrentDatas.page && (torrentDatas.page < torrentDatas.total_pages)) {
-              extraTorrentAPI.search({
-              with_words: 'hd',
-              page: torrentDatas.page + 1,
-              seeds_from: 100,
-              category: 'movies',
-              added: 7,
-            }).then(filmsList => {
-                // console.log(filmsList)
-                var j = 0
-                getMovieDatas(filmsList.results, j, list)
-              })
-              .catch(err => console.error(err));
-          }
-          else if ((i == torrentDatas.length) || (torrentDatas.page && (torrentDatas.page == torrentDatas.total_pages))){
-            // for (var x = 0; x < socket.filmsIndex; x++) {
-              socket.filmsList = torrentDatas
-              socket.filmsListLength = torrentDatas.length
-              // io.to(data.id).emit('browseFilmsList', {filmsList: torrentDatas[x]})
-            // }
+          if (filmsList[n].title < filmsList[n - 1].title) {
+            var temp2 = filmsList[n]
+            filmsList[n] = filmsList[n - 1]
+            filmsList[n - 1] = temp2
+            temp2 = ''
+            n = (filmsList.length - 1)
           }
         }
       }
+      if (m == (filmsList.length - 1) && (!n)) {
+        return (callback(filmsList))
+      }
+    }
+    
+    function firstRow(sortedList) {
+      var j = 0
+      var k = 0
+      var length = sortedList.length
+      while ((j < length) && (k < 8)) {
+        if (sortedList[j] && sortedList[j].movieDatas && (sortedList[j].movieDatas.poster.slice(0, 4) == "http") && ((j === 0) || (sortedList[j].movieDatas.title != sortedList[j - 1].movieDatas.title))) {
+          io.to(data.id).emit('browseFilmsList', {filmsList: sortedList[j]})
+          k++
+        }
+        j++
+      }
+    }
 
-      extraTorrentAPI.search({
-        with_words: 'hd',
-        page: 1,
-        seeds_from: 50,
-        leechers_from: 50,
-        category: 'movies',
-        added: 7
-      }).then(filmsList => {
-          console.log(filmsList)
-          var list = []
-          var i = 0
-          getMovieDatas(filmsList.results, i, list)
-        })
-        .catch(err => console.error(err));
+    function getIMDbDatas(title, film) {
+      return new Promise((resolve, reject) => {
+        imdb.get(title)
+          .then(movieDatas => {
+            film.movieDatas = movieDatas
+              resolve(film)
+          })
+          .catch(err => {
+            reject("ERR IMDB: "+err.message)
+          })
+      })
+    }
 
-        socket.filmsIndex = 12;
-        PirateBay
-            .topTorrents(201)
-            .then(filmsList => {
-              var list = []
-              var i = 0
+    function inList(list, title) {
+      return new Promise((resolve, reject) => {
+        if ((list.indexOf(title)) != -1) {
+          reject("film en doublon: "+title)
+        }
+        else {
+          resolve('ok')
+        }
+      })
+    } 
+
+    
+    function getMovieDatas (filmsList, i, list) {
+      inList(list, filmsList[i].title).then((ret) => {
+        if (ret == 'ok') {
+          console.log(socket.filmsList.length+" "+filmsList[i].title)
+          list.push(filmsList[i].title)
+          getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
+            if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
+              if (!socket.filmsListLength) {
+                socket.filmsList[0] = film
+                socket.filmsListLength = 1
+              }
+              else {
+                socket.filmsListLength = socket.filmsListLength + 1  
+                socket.filmsList.push(film)
+              }
+              if (((socket.filmsListLength <= 8) && (!filmsList[i + 1])) || (socket.filmsListLength == 8)) {
+                firstRow(socket.filmsList)
+              }
+            }
+            i++
+            if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
-            })
-            .catch(err => console.log(err))
-    });
+            }
+          })
+          .catch(err => {
+            console.log(err)
+            i++
+            if (i < filmsList.length) {
+              getMovieDatas(filmsList, i, list)
+            }
+          })
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        i++
+        if (i < filmsList.length) {
+          getMovieDatas(filmsList, i, list)
+        }
+      })
+    }
+
+
+    function getTitles(list, filmsList, i) {
+      var filmsListLength = filmsList.length
+      return new Promise((resolve, reject) => {
+        if (filmsList[i].name) {
+          var parsedDatas = tnp(filmsList[i].name)
+          filmsList[i].title = parsedDatas.title
+        }
+        else if (filmsList[i].title) {
+          var parsedDatas = tnp(filmsList[i].title)
+          filmsList[i].title = parsedDatas.title
+        }
+        if (filmsList[i].title == '') {
+          reject("erreur tnp")
+        }
+        i++
+        if (i < filmsListLength) {            
+          resolve(i)
+          getTitles(list, filmsList, i).then((length) => {
+            if (length == (filmsList.length - 1)) {
+              sortList(filmsList, (filmsList) => {
+                var x = 0
+                getMovieDatas(filmsList, x, list)
+              })
+            }
+          })
+        }
+      })
+    }
+
+    // Les promesses de recherche de sources
+    var getSecondSource = new Promise((resolve, reject) => {
+      var filmsList = []
+      for (var i = 1; i < 3; i++) {
+        if (title) {
+          request('https://yts.ag/api/v2/list_movies.json?sort=like_count&query_term='+title+'&page='+i+'&limit=50', (err, response, body) => {
+            if (err){
+              reject(err); 
+            }
+            var filmsList2 = JSON.parse(body);
+            if (filmsList2.data.movies) {
+              for (var j = 0, len = filmsList2.data.movies.length; j < len; j++) {
+                filmsList.push(filmsList2.data.movies[j])
+              }
+            }
+          });
+        }
+        else {
+          request('https://yts.ag/api/v2/list_movies.json?sort=like_count&page='+i+'&limit=50', (err, response, body) => {
+            if (err){
+              reject(err); 
+            }
+            var filmsList2 = JSON.parse(body);
+            if (filmsList2.data.movies) {
+              for (var j = 0, len = filmsList2.data.movies.length; j < len; j++) {
+                filmsList.push(filmsList2.data.movies[j])
+              }
+            }
+          });
+        }
+      }
+      if (i == 3) {
+          resolve(filmsList)
+      }
+    })
+
+    var getFirstSource = new Promise((resolve, reject) => {
+      if (title) {
+        PirateBay.search(title, {
+          category: 201,
+          orderBy: 'leeches',
+          sortBy: 'desc'
+        })
+        .then(filmsList => {
+          if (filmsList[0]) {
+            resolve(filmsList)
+          }
+          else {
+            var tab = []
+            resolve(tab)
+          }
+        })
+        .catch(err => reject(err))
+      }
+      else {
+        PirateBay
+        .topTorrents(201)
+        .then(filmsList => {
+          if (filmsList[0]) {
+            resolve(filmsList)
+          }
+          else {
+            var tab = []
+            resolve(tab)
+          }
+        })
+        .catch(err => reject(err))
+      }
+    })
+
+    // Le script principal
+    getFirstSource.then((filmsList) => {
+      getSecondSource.then((filmsList2) => {
+        filmsList = filmsList.concat(filmsList2)
+
+        console.log("\nLISTE PIRATEBAY + YTS: ")
+        for (var a = 0; a < filmsList.length; a++) {
+          if (filmsList[a].title) {
+            console.log(filmsList[a].title)
+          }
+          else if(filmsList[a].name) {
+            console.log(filmsList[a].name)
+          }
+        }
+        console.log("\n")
+
+        var x = 0
+        getTitles(list,filmsList, x)
+        .catch(err => console.log(err))
+      })
+      .catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+  });
 });
+
+
 
 
 // error handler
