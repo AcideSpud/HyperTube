@@ -20,6 +20,7 @@ body {
 
 #home-btn {
   display: none;
+  margin-bottom: 10%;
 }
 
 #email, #pwd {
@@ -62,6 +63,9 @@ a:hover {
   font-style: italic;
   color: #9d9d9d;
   text-align: center;
+}
+.navbar-right {
+  margin-right: 0px;
 }
 
 
@@ -259,11 +263,11 @@ footer {
 
 
 
-@media (min-width: 768px) {
+/*@media (min-width: 768px) {*/
   .navbar-nav {
     float: right;
   }
-}
+/*}*/
 
 @media (max-width: 768px) {
   #reload {
@@ -271,5 +275,17 @@ footer {
     left: 0px;
   }
 }
+
+@media (max-width: 430px) {
+  #logo {
+    /*width: 80*/
+    font-size: 30px;
+    margin-right: 0%;
+  }
+}
+
+  /*.navbar-right {
+    margin-right: -15px;
+  }*/
 
 

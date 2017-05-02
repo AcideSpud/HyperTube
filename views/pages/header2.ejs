@@ -45,23 +45,13 @@
 
 <div class="container">
     <nav style="box-shadow: 1px 5px 7px rgb(0,7,5);border-radius: 10%;" class="navbar navbar-inverse navbar-static-top">
-      <div class="container-fluid">
-    <p>
-      <a class="navbar-brand" href="/">
-        <span >HyperTube<span>
-      </a>
-    </p>
-    <ul class="nav navbar-nav navbar-right">
-      <li>
-          <a href="/connexion/logout">
-            <div class="glyphicon glyphicon-remove-circle" style="font-size:1.5em; color:grey;">
-              <span>Logout</span>
-            </div>
-          </a>
-      </li>
-    </ul>
-  </div>
-</nav>
+        <a class="navbar-brand" href="/">
+          <span id="logo" >HyperTube<span>
+        </a>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/connexion/logout"><i class="fa fa-power-off fa-2x"></i></a></li>
+      </ul>
+  </nav>
 </div>
 <script src="/socket.io/socket.io.js"></script>
 
