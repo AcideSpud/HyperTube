@@ -517,6 +517,7 @@ io.sockets.on('connection', function (socket) {
           list.push(filmsList[i].title)
           getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
             if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
+              console.log(film.movieDatas.genre)
               if (!socket.filmsListLength) {
                 socket.filmsList[0] = film
                 socket.filmsListLength = 1
