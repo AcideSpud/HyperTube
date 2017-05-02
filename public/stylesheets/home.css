@@ -8,6 +8,7 @@ body {
   background-color: #444444;
 }
 
+
 /*Page de Log*/
 
 #inscription-btn, #home-btn, #forgotten-pwd-btn, #connexion_form {
@@ -247,6 +248,15 @@ footer {
   text-align: center;
   color: black;
 }
+
+
+/*Page d'accueil*/
+#inscription-btn1, #home-btn1, #connection-btn1 {
+  display: block;
+  width: : 250px;
+  margin: auto;
+}
+
 
 
 @media (min-width: 768px) {
