@@ -24,12 +24,6 @@ body {
   color: #9d9d9d;
   text-align: center;
 }
-@media (min-width: 768px) {
-  .navbar-nav {
-    float: right;
-  }
-
-}
 
 
 /*Barre de recherche*/
@@ -46,6 +40,23 @@ body {
   font-size: 50px;
 }
 
+#reload {
+  height: 50px;
+  position: relative;
+  left: 42.5%;
+  font-size: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-info {
+  background-image: linear-gradient(to bottom,#2aabd2 0,#2f71aa 100%);
+}
+.btn-info:hover {
+  background-position: 0px 0px;
+  background-image: linear-gradient(to bottom,#2f71aa 0,#2aabd2 100%);
+  /*color: #9d9d9d*/
+}
 
 /*Miniatures fiche films*/
 #filmsList {
@@ -109,6 +120,14 @@ body {
 }
 
 
+/*Message d'alerte*/
+#alert {
+  display: none;
+  margin-top: 15%;
+  text-align: center;
+  font-size: 50px;
+  color: #2f71aa;
+}
 
 /*Animation lors du traitement serveur*/
 #loadAnim {
@@ -185,3 +204,19 @@ footer {
   text-align: center;
   color: black;
 }
+
+
+@media (min-width: 768px) {
+  .navbar-nav {
+    float: right;
+  }
+}
+
+@media (max-width: 768px) {
+  #reload {
+    width: 100%;
+    left: 0px;
+  }
+}
+
+

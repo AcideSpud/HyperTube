@@ -115,95 +115,13 @@ app.use('/root', root);
 ////// ALL TIME :P //////
 // catch 404 and forward to error handler
 
+
 //Le système de navigation via socket
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function (socket) {
 
-  socket.on('getDatSort', (data) => {
-
-    function firstRow(sortedList) {
-      var j = 0
-      var k = 0
-      var length = sortedList.length
-      while ((j < length) && (k < 8)) {
-        if (sortedList[j] && sortedList[j].movieDatas && (sortedList[j].movieDatas.poster.slice(0, 4) == "http") && ((j === 0) || (sortedList[j].movieDatas.title != sortedList[j - 1].movieDatas.title))) {
-          io.to(data.id).emit('browseFilmsList', {filmsList: sortedList[j]})
-          k++
-        }
-        j++
-      }
-    }
-
-    var getTitleAscSort = new Promise((resolve, reject) => {
-      socket.filmsList.sort()
-      console.log("in getTitleAscSort: "+socket.filmsList[0].title)
-      resolve(socket.filmsList)
-      if (!socket.filmsList) {
-        reject('socket.filmsList vide!')
-      }
-    })
-
-    var getTitleDescSort = new Promise((resolve, reject) => {
-      socket.filmsList.reverse()
-      console.log("in getTitleDescSort: "+socket.filmsList[0].title)
-      resolve(socket.filmsList)
-      if (!socket.filmsList) {
-        reject('socket.filmsList vide!')
-      }
-    })
-
-    console.log(data)
-
-    if (data.sort == "title-asc") {
-      getTitleAscSort.then((filmsList) => {
-        console.log("after getTitleAscSort: "+socket.filmsList[0].title)
-        firstRow(socket.filmsList)
-      })
-      .catch(err => console.log(err))
-    }
-    else if (data.sort == "title-desc") {
-       getTitleDescSort.then((filmsList) => {
-        console.log("after getTitleDescSort: "+socket.filmsList[0].title)
-        firstRow(socket.filmsList)
-      })
-      .catch(err => console.log(err))
-    }
-
-    // io.to(data.id).emit('setUpdate', {filmsList: socket.filmsList})
-  })
-    
-  socket.on('getMoreFilms', (data) => {
-    console.log("ENCORE!")
-
-    var k = 0
-    var j = socket.filmsIndex
-    while ((j < socket.filmsListLength) && (k < 4)) {
-      if (socket.filmsList[j] && socket.filmsList[j].movieDatas && (socket.filmsList[j].movieDatas.poster.slice(0, 4) == "http") && (socket.filmsList[j].movieDatas.title != socket.filmsList[j - 1].movieDatas.title)) {
-        io.to(data.id).emit('browseFilmsList', {filmsList: socket.filmsList[j]})
-        k++
-      }
-      j++
-    }
-    socket.filmsIndex = j
-  })
-
-
-  socket.on('getFilmsList', function(data) {
-
-    // Initialisation des variables
-    if (data.title) {
-      var title = htmlspecialchars(data.title)
-      console.log("\nTITRE DEMANDÉ: "+title+"\n")
-    }
-    socket.filmsIndex = 8
-    socket.filmsList = []
-    socket.filmsListLength = 0
-    var list = []
-
-
-    // Les fonctions
-    function sortList(filmsList, callback){
+  function sortList(filmsList, callback){
       for (var m = 0; m < (filmsList.length - 1); m++) {
         for (var n = (filmsList.length - 1); n; n--) {
           if (filmsList[m].title > filmsList[m + 1].title) {
@@ -226,7 +144,333 @@ io.sockets.on('connection', function (socket) {
         return (callback(filmsList))
       }
     }
-    
+
+    function sortListByYear(filmsList, callback){
+      for (var m = 0; m < (filmsList.length - 1); m++) {
+        for (var n = (filmsList.length - 1); n; n--) {
+          if (filmsList[m].movieDatas.year > filmsList[m + 1].movieDatas.year) {
+            var temp = filmsList[m]
+            filmsList[m] = filmsList[m + 1]
+            filmsList[m + 1] = temp
+            temp = ''
+            m = 0
+          }
+          if (filmsList[n].movieDatas.year < filmsList[n - 1].movieDatas.year) {
+            var temp2 = filmsList[n]
+            filmsList[n] = filmsList[n - 1]
+            filmsList[n - 1] = temp2
+            temp2 = ''
+            n = (filmsList.length - 1)
+          }
+        }
+      }
+      if (m == (filmsList.length - 1) && (!n)) {
+        return (callback(filmsList))
+      }
+    }
+
+    function sortListByRank(filmsList, callback){
+      for (var l = 0; l < filmsList.length; l++) {
+        if (filmsList[l].movieDatas.rating == 'N/A') {
+          filmsList[l].movieDatas.rating = '0'
+        }
+      }
+      for (var m = 0; m < (filmsList.length - 1); m++) {
+        for (var n = (filmsList.length - 1); n; n--) {
+          if (filmsList[m].movieDatas.rating > filmsList[m + 1].movieDatas.rating) {
+            var temp = filmsList[m]
+            filmsList[m] = filmsList[m + 1]
+            filmsList[m + 1] = temp
+            temp = ''
+            m = 0
+          }
+          if (filmsList[n].movieDatas.rating < filmsList[n - 1].movieDatas.rating) {
+            var temp2 = filmsList[n]
+            filmsList[n] = filmsList[n - 1]
+            filmsList[n - 1] = temp2
+            temp2 = ''
+            n = (filmsList.length - 1)
+          }
+        }
+      }
+      if (m == (filmsList.length - 1) && (!n)) {
+        for (var m = 0; m < filmsList.length; m++) {
+          if (filmsList[m].movieDatas.rating == '0') {
+            filmsList[m].movieDatas.rating = 'N/A'
+          }
+        }
+        return (callback(filmsList))
+      }
+    }
+
+    function sortListByLength(filmsList, callback){
+      for (var l = 0; l < filmsList.length; l++) {
+        if (filmsList[l].movieDatas.runtime == 'N/A') {
+          filmsList[l].movieDatas.runtime = '0'
+        }
+      }
+      for (var m = 0; m < (filmsList.length - 1); m++) {
+        if (filmsList[m].movieDatas.runtime == 'N/A') {
+          filmsList[m].movieDatas.runtime = '0'
+        }
+        for (var n = (filmsList.length - 1); n; n--) {
+          if (parseInt(filmsList[m].movieDatas.runtime) > parseInt(filmsList[m + 1].movieDatas.runtime)) {
+            var temp = filmsList[m]
+            filmsList[m] = filmsList[m + 1]
+            filmsList[m + 1] = temp
+            temp = ''
+            m = 0
+          }
+          if (parseInt(filmsList[n].movieDatas.runtime) < parseInt(filmsList[n - 1].movieDatas.runtime)) {
+            var temp2 = filmsList[n]
+            filmsList[n] = filmsList[n - 1]
+            filmsList[n - 1] = temp2
+            temp2 = ''
+            n = (filmsList.length - 1)
+          }
+        }
+      }
+      if (m == (filmsList.length - 1) && (!n)) {
+        for (var m = 0; m < filmsList.length; m++) {
+          if (filmsList[m].movieDatas.runtime == '0') {
+            filmsList[m].movieDatas.runtime = 'N/A'
+          }
+        }
+        return (callback(filmsList))
+      }
+    }
+
+    function filterByTitle(filmsList, newList, filter) {
+      return new Promise((resolve, reject) => {
+        if (!filter) {
+          reject("Erreur: pas de filtre titre!")
+        }
+        if (filter[filter.length - 1] != ":") {
+          var length = filmsList.length
+          for (var j = 0; j < length; j++) {
+            if ((filter == 'AUTRE') && (filmsList[j].title[0].search(alpha) == -1)) {
+              newList.push(filmsList[j])
+            }
+            else if ((filter != 'AUTRE') && ((filmsList[j].title[0] == filter) || (filmsList[j].title[0] == filter.toLowerCase()))) {
+              newList.push(filmsList[j])
+            }
+          }
+          if (j == length) {
+            resolve(newList)
+          }
+        }
+        else {
+          resolve(newList)
+        }
+      })
+    }
+
+    function filterByYear(filmsList, newList, filter) {
+      return new Promise((resolve, reject) => {
+        if (!filter) {
+          reject("Erreur: pas de filtre année!")
+        }
+        if (filter[filter.length - 1] != ":") {
+          var length = filmsList.length
+          for (var j = 0; j < length; j++) {
+            if ((filter == '<1930') && (parseInt(filmsList[j].movieDatas.year) < 1930)) {
+              newList.push(filmsList[j])
+            }
+            else if ((filter != '<1930') && (parseInt(filmsList[j].movieDatas.year) >= parseInt(filter)) && (parseInt(filmsList[j].movieDatas.year) < (parseInt(filter) + 10))) {
+              newList.push(filmsList[j])
+            }
+          }
+          if (j == length) {
+            resolve(newList)
+          }
+        }
+        else {
+          resolve(filmsList)
+        }
+      })
+    }
+
+    function filterByRank(filmsList, newList, filter) {
+      return new Promise((resolve, reject) => {
+        if (!filter) {
+          reject("Erreur: pas de filtre note!")
+        }
+        if (filter[filter.length - 1] != ":") {
+          var length = filmsList.length
+          for (var j = 0; j < length; j++) {
+            console.log(parseInt(filter)+" "+parseInt(filmsList[j].movieDatas.rating))
+            if ((parseInt(filmsList[j].movieDatas.rating) >= parseInt(filter)) && (parseInt(filmsList[j].movieDatas.rating) < (parseInt(filter) + 1))) {
+              newList.push(filmsList[j])
+            }
+          }
+          if (j == length) {
+            resolve(newList)
+          }
+        }
+        else {
+          resolve(filmsList)
+        }
+      })
+    }
+
+    function filterList(filmsList, filters, callback) {
+        var alpha = '/[^A-Za-z]/'
+        var newList = []
+
+        filterByTitle(filmsList, newList, filters["title"]).then((titleList) => {
+          var newList = []
+          filterByYear(titleList, newList, filters["year"]).then((yearList) => {
+            var newList = []
+            filterByRank(yearList, newList, filters["rank"]).then((rankList) => {
+              // socket.listToSort = socket.filmsList
+              socket.filmsList2 = rankList
+              callback(rankList)
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        if (filters['genre'] == '') {
+          
+        }
+    }
+
+  socket.on('getMoreFilms', (data) => {
+    console.log("ENCORE!")
+
+    var k = 0
+    var j = socket.filmsIndex
+    if (socket.filmsList2) {
+      while ((j < socket.filmsList2.length) && (k < 4)) {
+        if (socket.filmsList2[j] && socket.filmsList2[j].movieDatas && (socket.filmsList2[j].movieDatas.poster.slice(0, 4) == "http") && (socket.filmsList2[j].movieDatas.title != socket.filmsList2[j - 1].movieDatas.title)) {
+          io.to(data.id).emit('browseFilmsList', {filmsList: socket.filmsList2[j]})
+          k++
+        }
+        j++
+      }
+    }
+    else {
+      while ((j < socket.filmsListLength) && (k < 4)) {
+        if (socket.filmsList[j] && socket.filmsList[j].movieDatas && (socket.filmsList[j].movieDatas.poster.slice(0, 4) == "http") && (socket.filmsList[j].movieDatas.title != socket.filmsList[j - 1].movieDatas.title)) {
+          io.to(data.id).emit('browseFilmsList', {filmsList: socket.filmsList[j]})
+          k++
+        }
+        j++
+      }
+    }
+    socket.filmsIndex = j
+  })
+
+  socket.on('getDatSort', (data) => {
+
+    if (socket.filmsList2) {
+      var listToSort = socket.filmsList2
+    }
+    else {
+      var listToSort = socket.filmsList
+    }
+    if (listToSort == '') {
+        io.to(data.id).emit('browseFilmsList', {filmsList: 'empty'})
+    }
+
+    function firstRow(sortedList) {
+      if (sortedList == '') {
+        io.to(data.id).emit('browseFilmsList', {filmsList: 'empty'})
+      }
+      else {
+        var j = 0
+        var k = 0
+        var length = sortedList.length
+        // socket.filmsListLength = sortedList.length
+        while ((j < length) && (k < 8)) {
+          if (sortedList[j] && sortedList[j].movieDatas && (sortedList[j].movieDatas.poster.slice(0, 4) == "http") && ((j === 0) || (sortedList[j].movieDatas.title != sortedList[j - 1].movieDatas.title))) {
+            io.to(data.id).emit('browseFilmsList', {filmsList: sortedList[j]})
+            k++
+            // socket.filmsIndex = k
+          }
+          j++
+        }
+      }
+    }
+
+
+    console.log(data)
+
+    if (data.sort == "title-asc") {
+      sortList(listToSort, (filmsList) => {
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "title-desc") {
+      sortList(listToSort, (filmsList) => {
+        filmsList.reverse()
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "year-asc") {
+      sortListByYear(listToSort, (filmsList) => {
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "year-desc") {
+      sortListByYear(listToSort, (filmsList) => {
+        filmsList.reverse()
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "rank-asc") {
+      sortListByRank(listToSort, (filmsList) => {
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "rank-desc") {
+      sortListByRank(listToSort, (filmsList) => {
+        filmsList.reverse()
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "length-asc") {
+      sortListByLength(listToSort, (filmsList) => {
+        firstRow(filmsList)
+      })
+    }
+    else if (data.sort == "length-desc") {
+      sortListByLength(listToSort, (filmsList) => {
+        filmsList.reverse()
+        firstRow(filmsList)
+      })
+    }
+    else if (data.title) {
+      filterList(listToSort, data, (filmsList) => {
+        firstRow(filmsList)
+      })
+    }
+
+    // io.to(data.id).emit('setUpdate', {filmsList: socket.filmsList})
+  })
+
+
+  socket.on('getFilmsList', function(data) {
+
+    // Initialisation des variables
+    if (data.title) {
+      var title = htmlspecialchars(data.title)
+      console.log("\nTITRE DEMANDÉ: "+title+"\n")
+    }
+    socket.filmsIndex = 8
+    socket.filmsList = []
+    socket.filmsListLength = 0
+    var list = []
+
+
+    // Les fonctions
     function firstRow(sortedList) {
       var j = 0
       var k = 0
@@ -268,7 +512,8 @@ io.sockets.on('connection', function (socket) {
     function getMovieDatas (filmsList, i, list) {
       inList(list, filmsList[i].title).then((ret) => {
         if (ret == 'ok') {
-          console.log(socket.filmsList.length+" "+filmsList[i].title)
+          // console.log(socket.filmsList.length+" "+filmsList[i].title)
+          // console.log(filmsList[i].magnetLink)
           list.push(filmsList[i].title)
           getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
             if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
