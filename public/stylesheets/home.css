@@ -20,7 +20,12 @@ body {
 
 #home-btn {
   display: none;
-  margin-bottom: 10%;
+  margin-bottom: 8%;
+  margin-top: 8%;
+}
+
+#forgotten-pwd-btn {
+  margin-bottom: 100px;
 }
 
 #email, #pwd {
@@ -259,6 +264,10 @@ footer {
   display: block;
   width: : 250px;
   margin: auto;
+}
+
+#connection-btn1 {
+  margin-top: 100px;
 }
 
 

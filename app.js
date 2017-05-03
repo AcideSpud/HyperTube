@@ -260,7 +260,7 @@ io.sockets.on('connection', function (socket) {
           }
         }
         else {
-          resolve(newList)
+          resolve(filmsList)
         }
       })
     }
@@ -298,13 +298,59 @@ io.sockets.on('connection', function (socket) {
         if (filter[filter.length - 1] != ":") {
           var length = filmsList.length
           for (var j = 0; j < length; j++) {
-            console.log(parseInt(filter)+" "+parseInt(filmsList[j].movieDatas.rating))
+            // console.log(parseInt(filter)+" "+parseInt(filmsList[j].movieDatas.rating))
             if ((parseInt(filmsList[j].movieDatas.rating) >= parseInt(filter)) && (parseInt(filmsList[j].movieDatas.rating) < (parseInt(filter) + 1))) {
               newList.push(filmsList[j])
             }
           }
           if (j == length) {
             resolve(newList)
+          }
+        }
+        else {
+          resolve(filmsList)
+        }
+      })
+    }
+
+    function isDatGenre(film, newList, genre) {
+      return new Promise((resolve, reject) => {
+        if (film == '') {
+          reject('Erreur isDatGenre: pas de film')
+        }
+        var genresTab = film.movieDatas.genres.split(',')
+        var length = genresTab.length
+        for (var i = 0; i < length; i++) {
+          if (genresTab[i].trim() == genre) {
+            // console.log(genresTab[i].trim()+" "+genre)
+            resolve(film)
+          }
+        }
+      })
+    }
+
+    function filterByGenre(filmsList, newList, filter) {
+      return new Promise((resolve, reject) => {
+        if (!filter) {
+          reject("Erreur: pas de filtre genre!")
+        }
+        if (filter[filter.length - 1] != ":") {
+          var length = filmsList.length
+          for (var j = 0; j < length; j++) {
+            isDatGenre(filmsList[j], newList, filter).then((film) => {
+              if (film) {
+                // console.log(film)
+                newList.push(film)
+                j++
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+            // console.log(length+" "+j)
+            if (j == (length - 1)) {
+              resolve(newList)
+            }
           }
         }
         else {
@@ -322,9 +368,15 @@ io.sockets.on('connection', function (socket) {
           filterByYear(titleList, newList, filters["year"]).then((yearList) => {
             var newList = []
             filterByRank(yearList, newList, filters["rank"]).then((rankList) => {
-              // socket.listToSort = socket.filmsList
-              socket.filmsList2 = rankList
-              callback(rankList)
+              var newList = []
+              filterByGenre(rankList, newList, filters["genre"]).then((genreList) => {
+                // socket.listToSort = socket.filmsList
+                socket.filmsList2 = genreList
+                callback(genreList)
+              })
+              .catch((err) => {
+                console.log(err)
+              })
             })
             .catch((err) => {
               console.log(err)
@@ -337,9 +389,6 @@ io.sockets.on('connection', function (socket) {
         .catch((err) => {
           console.log(err)
         })
-        if (filters['genre'] == '') {
-          
-        }
     }
 
   socket.on('getMoreFilms', (data) => {
@@ -467,6 +516,7 @@ io.sockets.on('connection', function (socket) {
     socket.filmsIndex = 8
     socket.filmsList = []
     socket.filmsListLength = 0
+    socket.genres = []
     var list = []
 
 
@@ -499,14 +549,36 @@ io.sockets.on('connection', function (socket) {
 
     function inList(list, title) {
       return new Promise((resolve, reject) => {
-        if ((list.indexOf(title)) != -1) {
-          reject("film en doublon: "+title)
-        }
-        else {
+        // if (title == '') {
+        //   reject('Erreur inList: pas de titre!')
+        // }
+        if ((list.indexOf(title)) == -1) {
           resolve('ok')
         }
+        else {
+          reject("film en doublon: "+title)
+        }
       })
-    } 
+    }
+
+    function getGenres(genresStr) {
+      return new Promise((resolve, reject) => {
+        if (genresStr == '') {
+          reject('Erreur getGenres: pas de genre')
+        }
+        var genresTab = genresStr.split(',')
+        var length = genresTab.length
+        for (var i = 0; i < length; i++) {
+          if (socket.genres.indexOf(genresTab[i].trim()) == -1) {
+            socket.genres.push(genresTab[i].trim())
+            // console.log(socket.genres)
+          }
+          if (i == (length - 1)) {
+            resolve('ok')
+          }
+        }
+      })
+    }
 
     
     function getMovieDatas (filmsList, i, list) {
@@ -517,18 +589,28 @@ io.sockets.on('connection', function (socket) {
           list.push(filmsList[i].title)
           getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
             if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
-              console.log(film.movieDatas.genre)
-              if (!socket.filmsListLength) {
-                socket.filmsList[0] = film
-                socket.filmsListLength = 1
-              }
-              else {
-                socket.filmsListLength = socket.filmsListLength + 1  
-                socket.filmsList.push(film)
-              }
-              if (((socket.filmsListLength <= 8) && (!filmsList[i + 1])) || (socket.filmsListLength == 8)) {
-                firstRow(socket.filmsList)
-              }
+              getGenres(film.movieDatas.genres).then((r) => {
+                if (r == 'ok') {
+                  // console.log(i+" "+filmsList.length)
+                  if (i == filmsList.length) {
+                    io.to(data.id).emit('browseGenres', {genres: socket.genres})
+                  }
+                  if (!socket.filmsListLength) {
+                    socket.filmsList[0] = film
+                    socket.filmsListLength = 1
+                  }
+                  else {
+                    socket.filmsListLength = socket.filmsListLength + 1  
+                    socket.filmsList.push(film)
+                  }
+                  if (((socket.filmsListLength <= 8) && (!filmsList[i + 1])) || (socket.filmsListLength == 8)) {
+                    firstRow(socket.filmsList)
+                  }
+                }
+              })
+              .catch(err => {
+                console.log(err)
+              })
             }
             i++
             if (i < filmsList.length) {
