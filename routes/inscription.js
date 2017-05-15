@@ -21,6 +21,8 @@ router.post('/inscription', (req, res)=>{
 
 let email = sanitizeHtml(req.body.email);
 let username = sanitizeHtml(req.body.pseudo);
+let nom = sanitizeHtml(req.body.nom);
+let prenom = sanitizeHtml(req.body.prenom);
 let pawd = bcrypt.hashSync(req.body.pwd);
 let geo = JSON.parse(req.body.geo);
 
@@ -47,7 +49,7 @@ async.waterfall([
 			return callback('Dsl quelqu utilise ce pseudo')
 
 		else{
-			var NewUser = new UserModel({ username : username, pwd : pawd, mail: email});
+			var NewUser = new UserModel({ username : username, pwd : pawd, mail: email, nom: nom, prenom: prenom});
 			NewUser.save(function (err) {
   				if (err) return callback(err);
 				return callback(null, 'TU es enregistre');

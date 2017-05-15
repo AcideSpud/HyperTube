@@ -1,0 +1,272 @@
+<% include header2 %>
+<div class="container text-center">
+	<h1>PROFILE</h1>
+</div>
+<div class="container text-center">
+<br>
+<br>
+
+ <form class="form-inline">
+  <div class="form-group">
+    <label for="email">Email : <span id="validator_email" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_email" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
+    <input type="email" class="form-control" id="email" value="<%= user.email %>" />
+  </div>
+  <button id="b_email" type="submit" class="btn btn-default">Submit</button>
+  <div class="form-group" id="result_email"></div>
+ </form>
+ <br>
+<hr>
+
+ <form class="form-inline">
+  <div class="form-group">
+    <label for="pwd">Pwd :  <span id="validator_pwd" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_pwd" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
+    <input type="password" class="form-control" id="pwd">
+  </div>
+  <button id="b_pwd" type="submit" class="btn btn-default">Submit</button>
+  <div class="form-group" id="result_pwd"></div>
+ </form>
+
+<br>
+<hr>
+
+<form class="form-inline">
+  <div class="form-group">
+    <label for="nom">nom :  <span id="validator_nom" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_nom" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
+    <input type="nom" class="form-control" id="nom" value="<%= user.nom %>">
+  </div>
+  <div class="form-group">
+    <label for="prenom">prenom :  <span id="validator_prenom" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_prenom" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
+    <input type="prenom" class="form-control" id="prenom" value="<%= user.nom %>">
+  </div>
+  <button id="b_nom" type="submit" class="btn btn-default">Submit</button>
+  <div class="form-group" id="result_gender"></div>
+ </form>
+
+
+<br>
+<hr>
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="langue">langue :  <span id="validator_langue" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_langue" style="color:red;" class="glyphicon glyphicon-remove"></span></label><br>
+    <label class="radio-inline"><input name="langue" type="radio" value="FR" id="langue">
+    	FR<i class="fa fa-mars"></i>
+    </label>
+<label class="radio-inline"><input name="langue" type="radio" value="ANG" id="langue">ANG<i class="fa fa-venus"></i></label>
+  </div>
+  <button id="b_langue" type="submit" class="btn btn-default">Submit</button>
+  <div class="form-group" id="result_sexe"></div>
+ </form>
+
+
+<br>
+<hr>
+
+<form class="" id="uploadImgForm" enctype="multipart/form-data" action="/profile/img" method="post">
+    <div class="form-group">
+      <input id="img" class="btn btn-info" type="file" name="userImg" multiple style="display:inline;"/>
+    </div>
+    <div class="form-group">
+      <span id="status"></span>
+    </div>
+    <div class="form-group">
+      <input id="b_img" class="btn btn-default"  value="Upload" type="submit">
+    </div>
+  </form>
+
+<br>
+<hr>
+
+</div>
+
+<script>
+  $(function(){
+
+    $('#b_email').click(function(e){
+      e.preventDefault();
+
+      var $email = $("#email").val();
+
+      console.log('email: ', $email);
+
+      if (check($email)){
+            $.post(
+                'profile/email',
+                {
+                    email : $email,
+                },
+                function(data){
+                  if (data){
+                      $("#result_email").html(data);
+                      $("#validator_email").css({display: 'inline'})
+                      $("#unvalidator_email").css({display: 'none'})
+                  }
+                    else{
+                      $("#result_email").html('Une erreur serveur est survenue');
+                      $("#validator_email").css({display: 'none'})
+                      $("#unvalidator_email").css({display: 'inline'})
+
+                    }
+                    
+                },
+                'text'
+            );
+          } else{
+            $("#result_email").html('le champ est vide');
+            $("#validator_email").css({display: 'none'})
+              $("#unvalidator_email").css({display: 'inline'})
+          }
+      });
+
+
+
+    $('#b_pwd').click(function(e){
+      e.preventDefault();
+
+      var $pwd = $("#pwd").val();
+
+      console.log('pwd: ', $pwd);
+
+      if (check($pwd)){
+            $.post(
+                'profile/pwd',
+                {
+                    pwd : $pwd,
+                },
+                function(data){
+                    if (data){
+                      $("#result_pwd").html(data);
+                      $("#validator_pwd").css({display: 'inline'})
+                      $("#unvalidator_pwd").css({display: 'none'})
+                  }
+                    else{
+                      $("#result_pwd").html('Une erreur serveur est survenue');
+                      $("#validator_pwd").css({display: 'none'})
+                      $("#unvalidator_pwd").css({display: 'inline'})
+
+                    }
+                    
+                },
+                'text'
+            );
+          } else{
+            $("#result_pwd").html('le champ est vide');
+            $("#validator_pwd").css({display: 'none'})
+              $("#unvalidator_pwd").css({display: 'inline'})
+          }
+      });
+
+
+    $('#b_nom').click(function(e){
+      e.preventDefault();
+
+      var $nom = $("#nom").val();
+      var $prenom = $('#prenom').val();
+
+      console.log('nom: ', $nom);
+      console.log('prenom: ', $prenom);
+
+      if (check($nom) &&
+        check($prenom)){
+            $.post(
+                'profile/nom',
+                {
+                    nom : $nom,
+                    prenom : $prenom,
+                },
+                function(data){
+                    if (data){
+                      $("#result_nom").html(data);
+                      $("#validator_nom").css({display: 'inline'})
+                      $("#unvalidator_nom").css({display: 'none'})
+                      $("#validator_prenom").css({display: 'inline'})
+                      $("#unvalidator_prenom").css({display: 'none'})
+                  }
+                    else{
+                      $("#result_nom").html('Une erreur serveur est survenue');
+                      $("#validator_nom").css({display: 'none'})
+                      $("#unvalidator_nom").css({display: 'inline'})
+                      $("#validator_prenom").css({display: 'none'})
+                      $("#unvalidator_prenom").css({display: 'inline'})
+
+                    }
+                    
+                },
+                'text'
+            );
+          } else{
+            $("#result_nom").html('le champ est vide');
+            $("#validator_nom").css({display: 'none'})
+              $("#unvalidator_nom").css({display: 'inline'})
+              $("#validator_prenom").css({display: 'none'})
+              $("#unvalidator_prenom").css({display: 'inline'})
+          }
+      });
+    
+
+
+
+    $('#b_langue').click(function(e){
+      e.preventDefault();
+
+      var $langue = $('input[name="langue"]:checked').val();
+      var $pref = $('input[name="pref"]:checked').val();
+
+      console.log('langue: ', $langue);
+
+      if ($langue ){
+            $.post(
+                'profile/langue',
+                {
+                    langue : $langue,
+                },
+                function(data){
+                    if (data){
+                      $("#result_tag").html(data);
+                      $("#validator_langue").css({display: 'inline'})
+                      $("#unvalidator_langue").css({display: 'none'})
+                  }
+                    else{
+                      $("#result_tag").html('Une erreur serveur est survenue');
+                      $("#validator_langue").css({display: 'none'})
+                      $("#unvalidator_langue").css({display: 'inline'})
+                    }
+                    
+                },
+                'text'
+            );
+          } else{
+            $("#result_tag").html('le champ est vide');
+            $("#validator_langue").css({display: 'none'})
+              $("#unvalidator_langue").css({display: 'inline'})
+          }
+      });
+
+})
+
+$('#uploadImgForm').submit(function() {
+        $("#status").empty().text("File is uploading...");
+        $(this).ajaxSubmit({
+            error: function(xhr) {
+              $("#status").empty().text(xhr);
+            },
+            success: function(response) {
+              console.log(response)
+            $("#status").empty().text('ok');
+            }
+        });
+    return false;
+    });
+
+  function check(champs, champName){
+        if(champs == "")
+          return false;
+        else return true;
+    };
+
+
+
+
+</script>
+
+<% include footer %>
