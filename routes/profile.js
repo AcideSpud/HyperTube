@@ -4,7 +4,7 @@ let bodyParser = require('body-parser');
 let async = require('async');
 var sanitizeHtml = require('sanitize-html');
 var bcrypt = require('bcryptjs');
-//var multer = require('multer');
+var multer = require('multer');
 
 router.use(bodyParser.urlencoded({ extended: false }));
 
@@ -63,47 +63,52 @@ router.post('/langue', function(req, res){
 		else res.status(200).send('La langue à été changée');
 	})
 })
-/*
 
 router.post('/img', (req, res)=>{
 	var storage =   multer.diskStorage({
-  destination: function (req, file, callback) {
-    callback(null, './public/img');
-  },
-  filename: function (req, file, callback) {
+ 		destination: function (req, file, callback) {
+    		callback(null, './public/img');
+  		},
+  		filename: function (req, file, callback) {
 
-  	console.log('file', file);
-  	if (file.mimetype == 'image/jpeg'){
-	
-		var	path =  file.fieldname + '-' + Date.now() + '.jpg';
-		Utilisateur.uploadImg(req.session.user.pseudo, path, (res, err)=>{
+  			console.log('file', file);
+  			if (file.mimetype == 'image/jpeg'){
+  				var	path =  file.fieldname + '-' + Date.now() + '.jpg';
+  				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: path},  (err, result)=>{
+  					if (err)
+  						callback(err);
+  					else callback(null, path)
+  				})
+  			} else if (file.mimetype == 'image/png'){
+  				var	path = file.fieldname + '-' + Date.now() + '.png';
+  				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: path},  (err, result)=>{
+  					if (err)
+  						callback(err);
+  					else callback(null, path)
 
-				if (err)
-					callback(err);
-				else callback('ok')
-				
-			})
-			callback(null, path);
-		}
-	else callback('JUSTE JPG')
+  				})
+  			} else callback('Just Png or Jpg');
+  		}
+	});
 
-
-  	console.log('JE SUIS LA AU MNOINS', file)
-    callback(null, 'coucouc');
-  }
-});
 	var upload = multer({ storage : storage}).single('userImg');
 
 	console.log('tupasse?')
 
 	upload(req,res,function(err) {
-        if(err) {
-            return res.status(200).send("Error uploading file.");
+
+		if(err) {
+			console.log('err', err)
+            return res.end("Error uploading file.");
         }
         console.log('coucou final')
-        res.status(200).send("File is uploaded");
+        res.end("File is uploaded");
+
     });
 })
+
+/*
+
 
 
 router.post('/delImg', (req, res)=>{

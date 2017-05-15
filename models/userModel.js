@@ -7,7 +7,8 @@ var User_Schema = new mongoose.Schema({
   			langue: String,
   			pwd : String,
   			mail : String,
-  			date : { type : Date, default : Date.now }
+  			date : { type : Date, default : Date.now },
+  			img : String
 });
 
 
