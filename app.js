@@ -121,6 +121,7 @@ var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function (socket) {
 
+  //Les fonctions de triage/fitrage
   function sortList(filmsList, callback){
       for (var m = 0; m < (filmsList.length - 1); m++) {
         for (var n = (filmsList.length - 1); n; n--) {
@@ -391,8 +392,8 @@ io.sockets.on('connection', function (socket) {
         })
     }
 
+  //L'event de pagination infini en scrollant
   socket.on('getMoreFilms', (data) => {
-    console.log("ENCORE!")
 
     var k = 0
     var j = socket.filmsIndex
@@ -417,6 +418,7 @@ io.sockets.on('connection', function (socket) {
     socket.filmsIndex = j
   })
 
+  //L'event de gestion du triage/filtrage
   socket.on('getDatSort', (data) => {
 
     if (socket.filmsList2) {
@@ -429,6 +431,7 @@ io.sockets.on('connection', function (socket) {
         io.to(data.id).emit('browseFilmsList', {filmsList: 'empty'})
     }
 
+    //Fonction affichant les 8 premiers films
     function firstRow(sortedList) {
       if (sortedList == '') {
         io.to(data.id).emit('browseFilmsList', {filmsList: 'empty'})
@@ -437,20 +440,15 @@ io.sockets.on('connection', function (socket) {
         var j = 0
         var k = 0
         var length = sortedList.length
-        // socket.filmsListLength = sortedList.length
         while ((j < length) && (k < 8)) {
           if (sortedList[j] && sortedList[j].movieDatas && (sortedList[j].movieDatas.poster.slice(0, 4) == "http") && ((j === 0) || (sortedList[j].movieDatas.title != sortedList[j - 1].movieDatas.title))) {
             io.to(data.id).emit('browseFilmsList', {filmsList: sortedList[j]})
             k++
-            // socket.filmsIndex = k
           }
           j++
         }
       }
     }
-
-
-    console.log(data)
 
     if (data.sort == "title-asc") {
       sortList(listToSort, (filmsList) => {
@@ -501,17 +499,15 @@ io.sockets.on('connection', function (socket) {
         firstRow(filmsList)
       })
     }
-
-    // io.to(data.id).emit('setUpdate', {filmsList: socket.filmsList})
   })
 
 
+  //L'event de départ lançant la création de la liste de films (avec un titre demandé ou non)
   socket.on('getFilmsList', function(data) {
 
     // Initialisation des variables
     if (data.title) {
       var title = htmlspecialchars(data.title)
-      console.log("\nTITRE DEMANDÉ: "+title+"\n")
     }
     socket.filmsIndex = 8
     socket.filmsList = []
@@ -665,7 +661,7 @@ io.sockets.on('connection', function (socket) {
       })
     }
 
-    // Les promesses de recherche de sources
+    // Les promesses qui gèrent la recherche des deux sources
     var getSecondSource = new Promise((resolve, reject) => {
       var filmsList = []
       for (var i = 1; i < 3; i++) {
