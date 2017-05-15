@@ -78,7 +78,7 @@
 <hr>
 
 </div>
-
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
 <script>
   $(function(){
 
@@ -252,7 +252,7 @@ $('#uploadImgForm').submit(function() {
             },
             success: function(response) {
               console.log(response)
-            $("#status").empty().text('ok');
+            $("#status").empty().text(response);
             }
         });
     return false;
