@@ -49,7 +49,7 @@ async.waterfall([
 			return callback('Dsl quelqu utilise ce pseudo')
 
 		else{
-			var NewUser = new UserModel({ username : username, pwd : pawd, mail: email, nom: nom, prenom: prenom});
+			var NewUser = new UserModel({ username : username, pwd : pawd, mail: email, nom: nom, prenom: prenom, langue: 'ang'});
 			NewUser.save(function (err) {
   				if (err) return callback(err);
 				return callback(null, 'TU es enregistre');
