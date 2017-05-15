@@ -249,7 +249,6 @@
 
 	        socket.on('browseGenres', (data) => {
 	        	console.log(data.genres[0])
-	        	// var genres = $('#genre').children()
 	        	for (var i = 0; i < data.genres.length; i++) {
 	        		$('#genre').append('<option value="'+data.genres[i]+'">' + data.genres[i] + '</option>')
 	        	}
