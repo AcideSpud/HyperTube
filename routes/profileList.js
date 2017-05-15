@@ -23,7 +23,7 @@ function requireLogin (req, res, next) {
 };
 
 
-router.get('/profileList', function(req, res, next) {
+router.get('/', function(req, res, next) {
   res.render('pages/profileList', {});
   next();
 });
