@@ -24,8 +24,14 @@ function requireLogin (req, res, next) {
 
 
 router.get('/', function(req, res, next) {
-  res.render('pages/profileList', {});
-  next();
+	UserModel.find({}, function(err, users) {
+    if (!err){ 
+    	console.log('all USERS____', users);
+        res.render('pages/profileList', {users: users});
+  		next();
+    } else {throw err;}
+});
+  
 });
 
 module.exports = router;
