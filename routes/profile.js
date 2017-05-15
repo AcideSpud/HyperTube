@@ -102,12 +102,9 @@ router.post('/img', (req, res)=>{
             return res.status(200).end("Error uploading file.");
         }
         console.log('coucou final')
-<<<<<<< HEAD
         // res.end("File is uploaded");
-=======
         res.status(200).end("File is uploaded");
 
->>>>>>> 5be7d2cd107a4b5a2e7ae62bbcca99bf22ef7aa7
     });
 })
 
