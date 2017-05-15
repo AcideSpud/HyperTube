@@ -34,9 +34,9 @@
     </div>
 
     <div class="col-md-6 col-md-offset-3">
-      <a href="/home"><button id="home-btn" type="button" class="btn btn-info">Home</button></a>
+      <!-- <a href="/home"><button id="home-btn" type="button" class="btn btn-info">Home</button></a> -->
       <a href="/inscription"><button id="inscription-btn" type="button" class="btn btn-info">Pas encore inscrit?</button></a>
-      <a href="/profile"><button id="profile-btn" type="button" class="btn btn-info">Profile</button></a>
+      <!-- <a href="/profile"><button id="profile-btn" type="button" class="btn btn-info">Profile</button></a> -->
       <button id="forgotten-pwd-btn" type="button" class="btn btn-info" data-toggle="modal" data-target=".bd-example-modal-sm">j'ai oublié mon pwd</button>
       <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm">
@@ -74,6 +74,10 @@
       e.currentTarget.placeholder = 'Enter password...';
     });
 
+    $("#logoutIcon").css('display', 'none');
+    $("#profileIcon").css('display', 'none');
+    $("#homeIcon").css('display', 'none');
+
     $(function(){
 
       var $email = $("#email"),
@@ -97,8 +101,14 @@
               },
               function(data){
                 $("#resultat").html(data);
-                $("#home-btn").fadeIn();
-                $("#home-btn").css('display', 'block');
+                // $("#home-btn").fadeIn();
+                // $("#home-btn").css('display', 'block');
+                $("#profileIcon").fadeIn();
+                $("#profileIcon").css('display', 'block');
+                $("#logoutIcon").fadeIn();
+                $("#logoutIcon").css('display', 'block');
+                $("#homeIcon").fadeIn();
+                $("#homeIcon").css('display', 'block');
               },
               'text'
            );

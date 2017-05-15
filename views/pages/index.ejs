@@ -13,12 +13,12 @@
 		      		<button id="inscription-btn1" type="button" class="btn btn-info">Inscription</button>
 		      	</a>
 		    </div>
-		    <hr>
+		    <!-- <hr>
 		    <div class="form-group">
 		      	<a href="/home">
 		      		<button id="home-btn1" type="button" class="btn btn-info">Home</button>
 		      	</a>
-		    </div>
+		    </div> -->
 		</div>
 </div>
 
@@ -37,10 +37,14 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
 
-				var socket = io.connect('http://localhost:8080');
-		    	socket.on('connect', function() {
-			        
-		    	});
+			$("#logoutIcon").css('display', 'none');
+		    $("#profileIcon").css('display', 'none');
+		    $("#homeIcon").css('display', 'none');
+		    
+			var socket = io.connect('http://localhost:8080');
+	    	socket.on('connect', function() {
+		        
+	    	});
 		</script>
 
 <%include footer %>

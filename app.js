@@ -38,6 +38,7 @@ var home = require('./routes/home');
 var inscription = require('./routes/inscription');
 var connexion = require('./routes/connexion');
 var profile = require('./routes/profile');
+var profileList = require('./routes/profileList');
 
 //MODEL
 var UserModel = require("./models/userModel.js").UserModel;
@@ -112,6 +113,7 @@ app.use('/home', home);
 app.use('/connexion', connexion);
 app.use('/inscription', inscription);
 app.use('/profile', profile);
+app.use('/profileList', profileList);
 app.use('/root', root);
 
 ////// ALL TIME :P //////
