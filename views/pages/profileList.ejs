@@ -2,10 +2,10 @@
 <link rel="stylesheet" type="text/css" href="../../stylesheets/profile_cards.css">
 
 <main class="wrapper">
-    <div class="container">
+    <div class="container" id="profileList">
 
 
-	    <div class="col-sm-3" id="userLogin%>">
+	    <div class="col-sm-3" id="profileModel%>">
 	        <div class="card">
 	            <canvas class="header-bg" width="250" height="70" id="header-blur"></canvas>
 	            <div class="avatar">
@@ -13,15 +13,63 @@
 	            </div>
 	            <div class="content">
 	                <h3>userLogin</h3>
-	               	<p> userFirstname,  userLastname </p>
+	               	<p id="firstname"> userFirstname</p>
+	               	<p id="lastname">userLastname </p>
 	            </div>
 	        </div>
+	    	<img class="src-image"  src="img/42.png"/>
 	    </div>
-	    <img class="src-image"  src="img/42.png"/>
+
+	    <div class="col-md-3" id="model">
+			<div class="film">
+				<div class="image-container">
+				</div>
+				<div class="filmInfo">
+					<div class="text">
+						<div class="title"></div>
+						<div class="year"></div>
+						<div class="rating"></div>
+					</div>
+				</div>
+			</div>
+		</div>
 		    
 	</div>
 
 </main>
-<script src="profile_cards.js" ></script>  
+<script src="profile_cards.js" ></script>
+<script type="text/javascript">
+	<% for (var i = 1; i < users.length; i++) { %>
+		$('#model').css('display', 'none')
+		var clone = $('#model').clone()
+		clone.attr('id', '<%=users[i].username%>')
+		clone.css("margin-bottom", "10px");
+		clone.hover(function() {
+			$(this).find('.filmInfo').css("display", "inline-block");
+		    }, function(){
+		    $(this).find('.filmInfo').css("display", "none");
+		});
+		clone.find('.image-container').css('backgroundImage', 'url("img/42.png")');
+		clone.find('.image-container').css('background-repeat', 'round');
+		clone.find('.title').text('<%=users[i].username%>');
+		clone.find('.year').text('prénom: <%=users[i].prenom%>');
+		clone.find('.rating').text('nom: <%=users[i].nom%>');
+		clone.css('display', 'inline-block')
+		clone.hide().fadeIn()
+		$('#profileList').append(clone);
+
+		$('#profileModel').css('display', 'none')
+		var clone = $('#profileModel').clone()
+		clone.attr('id', '<%=users[i].username%>')
+		clone.find('h3').text('<%=users[i].username%>')
+		clone.find('#firstname').text('prénom: <%=users[i].prenom%>')
+		clone.find('#lastname').text('nom: <%=users[i].nom%>')
+		clone.css('display', 'inline-block')
+		clone.hide().fadeIn()
+		$('#profileList').append(clone);
+	<%}%>
+	
+</script>
+
 
 <%include footer %>

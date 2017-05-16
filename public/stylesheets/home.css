@@ -260,9 +260,14 @@ footer {
 
 
 /*Page d'accueil*/
+.btn-info {
+  padding-top: 10px;
+}
+.btn-info:focus {
+  background-position: 0;
+}  
 #inscription-btn1, #home-btn1, #connection-btn1 {
-  display: block;
-  width: : 250px;
+  display: table;
   margin: auto;
 }
 
