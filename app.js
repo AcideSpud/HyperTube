@@ -119,6 +119,18 @@ app.use('/root', root);
 ////// ALL TIME :P //////
 // catch 404 and forward to error handler
 
+////FACEBOOK AUTHHH
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
+
 
 //Le système de navigation via socket
 var io = require('socket.io').listen(server);
