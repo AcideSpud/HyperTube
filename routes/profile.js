@@ -73,15 +73,15 @@ router.post('/img', (req, res)=>{
 
   			console.log('file', file);
   			if (file.mimetype == 'image/jpeg'){
-  				var	path = '/img/' + file.fieldname + '-' + Date.now() + '.jpg';
-  				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: path},  (err, result)=>{
+  				var	path = file.fieldname + '-' + Date.now() + '.jpg';
+  				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: '/img/' + path},  (err, result)=>{
   					if (err)
   						callback(err);
   					else callback(null, path)
   				})
   			} else if (file.mimetype == 'image/png'){
-  				var	path = '/img/' + file.fieldname + '-' + Date.now() + '.png';
-  				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: path},  (err, result)=>{
+  				var	path = file.fieldname + '-' + Date.now() + '.png';
+  				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: '/img/' + path},  (err, result)=>{
   					if (err)
   						callback(err);
   					else callback(null, path)
