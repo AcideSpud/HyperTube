@@ -5,7 +5,7 @@ let async = require('async');
 var sanitizeHtml = require('sanitize-html');
 var bcrypt = require('bcryptjs');
 var multer = require('multer');
-
+var passport = require('passport');
 router.use(bodyParser.urlencoded({ extended: false }));
 
 //MODEL
@@ -33,6 +33,16 @@ router.get('/', requireLogin, function(req, res, next) {
 		next();
 	})
  });
+
+router.get('/facebook',
+  passport.authenticate('facebook'));
+
+router.get('/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
 
 
 

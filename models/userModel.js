@@ -8,7 +8,13 @@ var User_Schema = new mongoose.Schema({
   			pwd : String,
   			mail : String,
   			date : { type : Date, default : Date.now },
-  			img : String
+  			img : String,
+  			facebook: {
+  				id: String,
+  				token: String,
+  				email: String,
+  				name: String
+  			}
 });
 
 

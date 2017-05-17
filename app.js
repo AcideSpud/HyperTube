@@ -29,6 +29,7 @@ var imdb = require('imdb-api');
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
 var passport = require('passport');
+var flash = require('connect-flash')
 
 //// require ROUTES ! /////
 var index = require('./routes/index');
@@ -59,12 +60,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false }
 }))
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 app.use((req, res, next)=>{
   console.log('ahahah');
@@ -121,15 +127,7 @@ app.use('/root', root);
 
 ////FACEBOOK AUTHHH
 
-app.get('/auth/facebook',
-  passport.authenticate('facebook'));
 
-app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
 
 
 //Le système de navigation via socket
