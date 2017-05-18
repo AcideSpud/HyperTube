@@ -44,6 +44,8 @@ var profileList = require('./routes/profileList');
 //MODEL
 var UserModel = require("./models/userModel.js").UserModel;
 
+require('./config/passport.js')(passport);
+
 
 
 var app = express();
@@ -113,6 +115,21 @@ app.use((req, res, next) => {
   next();
 });
 ///// THIS ! ///////
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook', {scope: ['email ', 'public_profile']}));
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    console.log('res----', res.user);
+    console.log('req----', req.user.facebook);
+    req.session.user = req.user.facebook;
+    res.redirect('/home');
+  });
+
+
+
 app.use('/', index);
 app.use('/users', users);
 app.use('/home', home);
@@ -619,7 +636,7 @@ io.sockets.on('connection', function (socket) {
                 }
               })
               .catch(err => {
-                console.log(err)
+                //console.log(err)
               })
             }
             i++
@@ -628,7 +645,7 @@ io.sockets.on('connection', function (socket) {
             }
           })
           .catch(err => {
-            console.log(err)
+            //console.log(err)
             i++
             if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
@@ -637,7 +654,7 @@ io.sockets.on('connection', function (socket) {
         }
       })
       .catch((err) => {
-        console.log(err)
+        //console.log(err)
         i++
         if (i < filmsList.length) {
           getMovieDatas(filmsList, i, list)
@@ -750,16 +767,16 @@ io.sockets.on('connection', function (socket) {
       getSecondSource.then((filmsList2) => {
         filmsList = filmsList.concat(filmsList2)
 
-        console.log("\nLISTE PIRATEBAY + YTS: ")
+       // console.log("\nLISTE PIRATEBAY + YTS: ")
         for (var a = 0; a < filmsList.length; a++) {
           if (filmsList[a].title) {
-            console.log(filmsList[a].title)
+            //console.log(filmsList[a].title)
           }
           else if(filmsList[a].name) {
-            console.log(filmsList[a].name)
+           // console.log(filmsList[a].name)
           }
         }
-        console.log("\n")
+        //console.log("\n")
 
         var x = 0
         getTitles(list,filmsList, x)

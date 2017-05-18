@@ -1,6 +1,7 @@
 var LocalStrategy = require('passport-local').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy
 
-var configAuth = require('./auth');
+var configAuth = require('./auth.js');
 
 var UserModel = require("../models/userModel.js").UserModel;
 
@@ -10,15 +11,18 @@ module.exports = function(passport){
 		done(null, user.id);
 	});
 
+
 	passport.deserializeUser(function(id, done){
-		UserModel.find({username : req.session.user.username}, (err, user)=>{
+		UserModel.findById(id, (err, user)=>{
 		done(err, user);
 	})
+	}) 
+
 
 	/*passport.use('local-signup', new LocalStrategy({
 		usernameField: 'email',
 		passwordField: 'password',
-		passReqToCallback: true
+		
 	},
 	function(req, email, password, done){
 		process.nextTick(function(){
@@ -46,22 +50,31 @@ module.exports = function(passport){
 	passport.use(new FacebookStrategy({
     clientID: configAuth.facebookAuth.clientID,
     clientSecret: configAuth.facebookAuth.clientSecret,
-    callbackURL: configAuth.facebookAuth.callbackURL
+    callbackURL: configAuth.facebookAuth.callbackURL,
+    //passReqToCallback : true,
+    profileFields: ['id', 'emails', 'name', 'photos']
   },
-  function(accessToken, refreshToken, profile, cb) {
+  function(accessToken, refreshToken, profile, done) {
+  		//console.log('accessToken ', accessToken, 'refreshToken', refreshToken);
   		process.nextTick(function(){
-  			User.findOne({'facebook.id': profile.id}, function(err, user){
-  				if (err)
+  			UserModel.findOne({'facebook.id': profile.id}, function(err, user){
+  				if (err){
   					return done(err);
-  				if (user)
+  				}
+  				if (user){
+  					console.log('------PROFILE---1'+ JSON.stringify(profile))
   					return done(null, user);
-  				else{
+  				}
+  				else {
+  					console.log('------PROFILE---2'+ JSON.stringify(profile))
   					var newUser = new UserModel();
   					newUser.facebook.id = profile.id;
-  					newUser.facebook.token = accessToken;
-  					newUser.facebook.name = profile.name.given + ' ' + profile.name.familyName;
-  					newUser.facebook.email = profile.emails[0];
-
+  					newUser.username = profile.name.givenName + '-' + profile.name.familyName;
+  					newUser.nom = profile.name.familyName;
+  					newUser.prenom = profile.name.givenName;
+  					newUser.mail = profile.emails[0].value;
+  					newUser.img = '/img/' + profile.photos[0].value;
+					console.log('----' + newUser);
   					newUser.save(function(err){
   						if (err)
   							throw err;
@@ -69,8 +82,8 @@ module.exports = function(passport){
   					})
   				}
   			});
-  		})
-  }
-));
+  		});
+  	}
+	));
 
 };

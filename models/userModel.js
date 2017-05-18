@@ -1,9 +1,9 @@
 var mongoose = require("mongoose");
 
 var User_Schema = new mongoose.Schema({
-  			username : { type : String, match: /^[a-zA-Z0-9-_]+$/ },
-  			nom : { type : String, match: /^[a-zA-Z0-9-_]+$/ },
-  			prenom : { type : String, match: /^[a-zA-Z0-9-_]+$/ },
+  			username : { type : String },
+  			nom : { type : String },
+  			prenom : { type : String },
   			langue: String,
   			pwd : String,
   			mail : String,
