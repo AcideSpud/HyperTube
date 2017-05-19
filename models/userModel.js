@@ -14,7 +14,13 @@ var User_Schema = new mongoose.Schema({
   				token: String,
   				email: String,
   				name: String
-  			}
+  			},
+        forty2: {
+          id: String,
+          token: String,
+          name: String,
+          email: String
+        }
 });
 
 

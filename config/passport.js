@@ -1,5 +1,6 @@
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy
+var Key42Strategy = require('passport-42').Strategy;
 
 var configAuth = require('./auth.js');
 
@@ -85,5 +86,34 @@ module.exports = function(passport){
   		});
   	}
 	));
+
+	passport.use(new Key42Strategy({
+    clientID: configAuth.fortyTwoAuth.clientID,
+    clientSecret: configAuth.fortyTwoAuth.clientSecret,
+    callbackURL: configAuth.fortyTwoAuth.callbackURL
+  },
+  function(accessToken, refreshToken, profile, cb) {
+   process.nextTick(function(){
+  			UserModel.findOne({'42.id': profile.id}, function(err, user){
+  				if (err){
+  					return done(err);
+  				}
+  				if (user){
+  					console.log('------PROFILE---1'+ JSON.stringify(profile))
+  					return done(null, user);
+  				}
+  				else {
+  					console.log('------PROFILE---2'+ JSON.stringify(profile))
+  					var newUser = new UserModel();
+  					newUser.save(function(err){
+  						if (err)
+  							throw err;
+  						return done(null, newUser);
+  					})
+  				}
+  			});
+  		});
+  }
+  ))
 
 };
