@@ -30,6 +30,7 @@ var yifyquery = require('yify-query');
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
 var passport = require('passport');
+var flash = require('connect-flash')
 
 //// require ROUTES ! /////
 var index = require('./routes/index');
@@ -44,6 +45,8 @@ var watch = require('./routes/watch');
 
 //MODEL
 var UserModel = require("./models/userModel.js").UserModel;
+
+require('./config/passport.js')(passport);
 
 
 
@@ -61,12 +64,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false }
 }))
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 app.use((req, res, next)=>{
   console.log('ahahah');
@@ -109,6 +117,32 @@ app.use((req, res, next) => {
   next();
 });
 ///// THIS ! ///////
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook', {scope: ['email ', 'public_profile']}));
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    console.log('res----', res.user);
+    console.log('req----', req.user.facebook);
+    req.session.user = req.user.facebook;
+    res.redirect('/home');
+  });
+
+
+app.get('/auth/42', passport.authenticate('42'));
+
+    app.get('/auth/42/callback',
+  passport.authenticate('42', { failureRedirect: '/login' }),
+  function(req, res) {
+    console.log('res----', res.user);
+    console.log('req----', req.user);
+    req.session.user = req.user;
+    res.redirect('/home');
+  });
+
+
 app.use('/', index);
 app.use('/users', users);
 app.use('/home', home);
@@ -124,15 +158,7 @@ app.use('/watch', watch);
 
 ////FACEBOOK AUTHHH
 
-app.get('/auth/facebook',
-  passport.authenticate('facebook'));
 
-app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
 
 
 //Le système de navigation via socket
