@@ -25,10 +25,11 @@ var htmlspecialchars = require('htmlspecialchars');
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
 var imdb = require('imdb-api');
-var yifyquery = require('yify-query');
 
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
+let async = require('async');
+
 var passport = require('passport');
 var flash = require('connect-flash')
 
@@ -45,6 +46,7 @@ var watch = require('./routes/watch');
 
 //MODEL
 var UserModel = require("./models/userModel.js").UserModel;
+var CommentModel = require("./models/CommentModel.js").CommentModel;
 
 require('./config/passport.js')(passport);
 
@@ -436,6 +438,32 @@ io.sockets.on('connection', function (socket) {
           console.log(err)
         })
     }
+
+  //L'event de nouveau commentaire sur un film
+  socket.on('newComment', (data) => {
+    console.log(data)
+    // async.waterfall([
+    //   function(callback){
+    //     var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
+    //     NewComment.save(function (err) {
+    //         if (err) return callback(err);
+    //       return callback(null, 'Nouveau commentaire!');
+    //     });
+    //   }
+    // ]);
+  })
+
+  socket.on('getComments', (data) => {
+    console.log(data)
+    // CommentModel.find({movie: data.movie}, function(err, comments) {
+    //   if (!err){ 
+    //     console.log('all USERS____', comments);
+    //     io.to(data.id).emit('browseComments', {comments: comments})
+    //     next();
+    //   } else {throw err;}
+    // });
+    
+  })
 
   //L'event de pagination infini en scrollant
   socket.on('getMoreFilms', (data) => {

@@ -3,13 +3,102 @@
 <main class="wrapper">
     <div class="container" id="profileList">
 
+    	<div class="search">
+	    	<div class="form-section">
+
+		    	<div id="player-section" class="">
+
+					<div class="row">
+						<div class="col-sm-12">
+							<h1 id="movie-title"><%=title%></h3>
+						</div><!-- /col-sm-12 -->
+					</div><!-- /row -->
+
+					<div id="video-player" class="row">
+						<div class="col-sm-12">
+							<input id="magnet" type="hidden" name="" value='<%=movie%>'>
+						</div><!-- /col-sm-1 -->
+					</div><!-- /row -->
+
+				</div><!-- /container -->
+	    		
+	    	</div>	
+    	</div>
+
+    	<div class="search">
+	    	<div class="form-section">
+
+		    	<div id="comment-section" class="">
+
+					<div class="row">
+						<div class="col-md-12">
+		    				<input type="text" class="form-control" id="filmSearch" placeholder="Commenter le film...">
+						</div><!-- /col-sm-12 -->
+						<div class="col-sm-12">
+							<h3 id="comment-title">Commentaires:</h3>
+						</div><!-- /col-sm-12 -->
+					</div><!-- /row -->
+
+					<div class="row" id="comment-model">
+						<div class="col-sm-1">
+							<div class="thumbnail">
+								<img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+							</div><!-- /thumbnail -->
+						</div><!-- /col-sm-1 -->
+
+						<div class="col-sm-11">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<strong>myusername</strong> <span class="text-muted">commented 5 days ago</span>
+								</div>
+								<div class="panel-body">
+									Panel content
+								</div><!-- /panel-body -->
+							</div><!-- /panel panel-default -->
+						</div><!-- /col-sm-5 -->		
+					</div><!-- /row -->
+
+				</div><!-- /container -->
+	    		
+	    	</div>	
+    	</div>
+
+
 
 		    
 	</div>
 
 </main>
 <script type="text/javascript">
-	console.log('<%=movie%>')
+
+	$("#filmSearch").on('focus', (e) => {
+		e.currentTarget.placeholder = '';
+	});
+
+	$("#filmSearch").on('focusout', (e) => {
+		e.currentTarget.placeholder = 'Commenter le film...';
+	});
+
+
+	var socket = io.connect('http://localhost:8080');
+	socket.on('connect', function() {
+
+		socket.emit('getComments', {id: socket.id, movie: $('#magnet').attr('value')});
+
+		$("#filmSearch").on('keyup', (e) => {
+	        if ((e.keyCode == 13) && ($("#filmSearch").val() != '')) {
+				var clone = $("#comment-model").clone();
+				clone.attr('id', '')
+				clone.find('.panel-body').text($("#filmSearch").val())
+	            $('#comment-section').append(clone);
+	            console.log('<%=title%>')
+	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user.username%>', img: '<%=user.img%>', comment: $("#filmSearch").val()});
+	        }
+	    });
+
+		
+	})
+
 </script>
 
 
