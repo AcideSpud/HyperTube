@@ -46,6 +46,18 @@ body {
   font-size: 20px;
 }
 
+#logo42 {
+  height: 50px;
+  vertical-align: text-bottom;
+}
+
+#logos {
+  height: 50px;
+  width: 121px;
+  margin: auto;
+}
+}
+
 #resultat {
   width: 100%;
   text-align: center;
