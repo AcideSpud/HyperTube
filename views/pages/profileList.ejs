@@ -39,14 +39,14 @@
 </main>
 <script src="profile_cards.js" ></script>
 <script type="text/javascript">
-	<% for (var i = 1; i < users.length; i++) { %>
+	<% for (var i = 0; i < users.length; i++) { %>
 		$('#model').css('display', 'none')
 		$('#profileModel').css('display', 'none')
 		var clone = $('#profileModel').clone()
 		clone.attr('id', '<%=users[i].username%>')
 		clone.find('h3').text('<%=users[i].username%>')
-		clone.find('#firstname').text('prénom: <%=users[i].prenom%>')
-		clone.find('#lastname').text('nom: <%=users[i].nom%>')
+		clone.find('#firstname').text('Prénom: <%=users[i].prenom%>')
+		clone.find('#lastname').text('Nom: <%=users[i].nom%>')
 		clone.find(".src-image").attr('src', '<%=users[i].img%>')
 		clone.css('display', 'inline-block')
 		clone.hide().fadeIn()
@@ -63,8 +63,8 @@
 		clone.find('.image-container').css('backgroundImage', 'url("<%=users[i].img%>")');
 		clone.find('.image-container').css('background-repeat', 'round');
 		clone.find('.title').text('<%=users[i].username%>');
-		clone.find('.year').text('prénom: <%=users[i].prenom%>');
-		clone.find('.rating').text('nom: <%=users[i].nom%>');
+		clone.find('.year').text('Prénom: <%=users[i].prenom%>');
+		clone.find('.rating').text('Nom: <%=users[i].nom%>');
 		clone.css('display', 'inline-block')
 		clone.hide().fadeIn()
 		$('#profileList').append(clone);

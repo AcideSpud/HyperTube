@@ -172,7 +172,13 @@
 				<div class="filmInfo">
 					<div class="text">
 						<div class="title"></div>
-						<a id="browseFilm" type="button" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></a>
+						<form id="watch" action="watch/datas" method="post">
+							<input id="movieDatas" type="hidden" name="movie">
+							<!-- <input type="submit" value="Submit" style="display: none;">
+							<a id="browseFilm" type="submit" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></a> -->
+							<button  id="browseFilm" type="submit" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></button>
+						</form>
+						<!-- <a id="browseFilm" type="button" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></a> -->
 						<div class="year"></div>
 						<div class="rating"></div>
 						<div class="summary"></div>
@@ -224,6 +230,16 @@
 								clone.find('.year').text("Année de production: "+filmsList.movieDatas.year);
 								clone.find('.rating').text("Note IMDb: "+filmsList.movieDatas.rating);
 								clone.find('.summary').text("Résumé: "+filmsList.movieDatas.plot);
+								clone.find('#movieDatas').attr('value', filmsList.magnetLink)
+								clone.find('#browseFilm').on('click', function () {
+									$('#watch').submit();
+								});
+								// clone.find('#browseFilm').on('click', function () {
+								// 	var request = new XMLHttpRequest();
+								// 	request.open('POST', '/watch/datas', true);
+								// 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+								// 	request.send("movie="+JSON.stringify(filmsList));
+								// });
 								clone.hide().fadeIn()
 								$('#filmsList').append(clone);
 						}
@@ -248,7 +264,6 @@
 			});
 
 	        socket.on('browseGenres', (data) => {
-	        	console.log(data.genres[0])
 	        	for (var i = 0; i < data.genres.length; i++) {
 	        		$('#genre').append('<option value="'+data.genres[i]+'">' + data.genres[i] + '</option>')
 	        	}

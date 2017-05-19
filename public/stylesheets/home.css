@@ -172,6 +172,12 @@ a:hover {
   font-size: 14px;
 }
 
+#browseFilm {
+  color: #2f71aa;
+  background: transparent;
+  border: none;
+}
+
 
 /*Message d'alerte*/
 #alert {

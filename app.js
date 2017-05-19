@@ -18,14 +18,15 @@ var crypto = require('crypto');
 var htmlspecialchars = require('htmlspecialchars');
 
 
-const ExtraTorrentAPI = require('extratorrent-api').Website;
-const extraTorrentAPI = new ExtraTorrentAPI();
-
+// const ExtraTorrentAPI = require('extratorrent-api').Website;
+// const extraTorrentAPI = new ExtraTorrentAPI();
 // const KAT = require('kat-api-pt'); 
 // const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
 var imdb = require('imdb-api');
+var yifyquery = require('yify-query');
+
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
 var passport = require('passport');
@@ -39,6 +40,7 @@ var inscription = require('./routes/inscription');
 var connexion = require('./routes/connexion');
 var profile = require('./routes/profile');
 var profileList = require('./routes/profileList');
+var watch = require('./routes/watch');
 
 //MODEL
 var UserModel = require("./models/userModel.js").UserModel;
@@ -115,6 +117,7 @@ app.use('/inscription', inscription);
 app.use('/profile', profile);
 app.use('/profileList', profileList);
 app.use('/root', root);
+app.use('/watch', watch);
 
 ////// ALL TIME :P //////
 // catch 404 and forward to error handler
@@ -621,7 +624,7 @@ io.sockets.on('connection', function (socket) {
                 }
               })
               .catch(err => {
-                console.log(err)
+                // console.log(err)
               })
             }
             i++
@@ -630,7 +633,7 @@ io.sockets.on('connection', function (socket) {
             }
           })
           .catch(err => {
-            console.log(err)
+            // console.log(err)
             i++
             if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
@@ -639,7 +642,7 @@ io.sockets.on('connection', function (socket) {
         }
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
         i++
         if (i < filmsList.length) {
           getMovieDatas(filmsList, i, list)
@@ -752,16 +755,18 @@ io.sockets.on('connection', function (socket) {
       getSecondSource.then((filmsList2) => {
         filmsList = filmsList.concat(filmsList2)
 
-        console.log("\nLISTE PIRATEBAY + YTS: ")
+        // console.log("\nLISTE PIRATEBAY + YTS: ")
         for (var a = 0; a < filmsList.length; a++) {
           if (filmsList[a].title) {
-            console.log(filmsList[a].title)
+            // console.log(filmsList[a].title)
+            filmsList[a].magnetLink = 'magnet:?xt=urn:btih:'+filmsList[a].torrents[0].hash+'&dn=&tr=http://track.one:1234/announce&tr=udp://track.two:80'
           }
-          else if(filmsList[a].name) {
-            console.log(filmsList[a].name)
-          }
+          // else if(filmsList[a].name) {
+          //   console.log(filmsList[a].name)
+          // }
         }
-        console.log("\n")
+          // console.log(filmsList[a].magnetLink)
+        // console.log("\n")
 
         var x = 0
         getTitles(list,filmsList, x)
