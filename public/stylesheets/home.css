@@ -36,7 +36,7 @@ body {
   margin-bottom: 15px;
 }
 
-#connection, #omniauth, #inscription, #resultat {
+#connection, #omniauth, #inscription, #resultat, #profile {
   width: 100%;
   text-align: center;
   color: #2f71aa;
@@ -44,8 +44,11 @@ body {
   font-weight: bolder;
 }
 
-#omniauth, #resultat {
+#omniauth, #resultat, .radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe {
   font-size: 20px;
+}
+.radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe {
+  color: #2f71aa;
 }
 
 #logo42 {
@@ -82,6 +85,10 @@ a:hover {
 #frgt_pwd_form {
   width: 100%;
   margin-top: 15px;
+}
+
+hr {
+  width: 80%;
 }
 
 /*Barre de navigation*/

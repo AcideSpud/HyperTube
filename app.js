@@ -808,18 +808,18 @@ io.sockets.on('connection', function (socket) {
       getSecondSource.then((filmsList2) => {
         filmsList = filmsList.concat(filmsList2)
 
-        // console.log("\nLISTE PIRATEBAY + YTS: ")
+        console.log("\nLISTE PIRATEBAY + YTS: ")
         for (var a = 0; a < filmsList.length; a++) {
           if (filmsList[a].title) {
-            // console.log(filmsList[a].title)
+            console.log(filmsList[a])
             filmsList[a].magnetLink = 'magnet:?xt=urn:btih:'+filmsList[a].torrents[0].hash+'&dn=&tr=http://track.one:1234/announce&tr=udp://track.two:80'
           }
           else if(filmsList[a].name) {
-            // console.log(filmsList[a].name)
+            // console.log(filmsList[a])
           }
         }
         // console.log(filmsList[a].magnetLink)
-        // console.log("\n")
+        console.log("\n")
 
         var x = 0
         getTitles(list,filmsList, x)
