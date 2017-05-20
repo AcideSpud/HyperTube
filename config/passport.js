@@ -87,12 +87,12 @@ module.exports = function(passport){
   	}
 	));
 
-	passport.use(new Key42Strategy({
+	passport.use('42', new Key42Strategy({
     clientID: configAuth.fortyTwoAuth.clientID,
     clientSecret: configAuth.fortyTwoAuth.clientSecret,
     callbackURL: configAuth.fortyTwoAuth.callbackURL
   },
-  function(accessToken, refreshToken, profile, cb) {
+  function(accessToken, refreshToken, profile, done) {
    process.nextTick(function(){
   			UserModel.findOne({'42.id': profile.id}, function(err, user){
   				if (err){
