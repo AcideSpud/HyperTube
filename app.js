@@ -652,9 +652,8 @@ io.sockets.on('connection', function (socket) {
     
     function getMovieDatas (filmsList, i, list) {
       inList(list, filmsList[i].title).then((ret) => {
+        // console.log(socket.filmsList.length+" "+filmsList[i].title)
         if (ret == 'ok') {
-          // console.log(socket.filmsList.length+" "+filmsList[i].title)
-          // console.log(filmsList[i].magnetLink)
           list.push(filmsList[i].title)
           getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
             if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
@@ -678,7 +677,7 @@ io.sockets.on('connection', function (socket) {
                 }
               })
               .catch(err => {
-                // console.log(err)
+                console.log(err)
               })
             }
             i++
@@ -687,7 +686,7 @@ io.sockets.on('connection', function (socket) {
             }
           })
           .catch(err => {
-            // console.log(err)
+            console.log(err)
             i++
             if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
@@ -696,7 +695,7 @@ io.sockets.on('connection', function (socket) {
         }
       })
       .catch((err) => {
-        // console.log(err)
+        console.log(err)
         i++
         if (i < filmsList.length) {
           getMovieDatas(filmsList, i, list)
@@ -815,11 +814,11 @@ io.sockets.on('connection', function (socket) {
             // console.log(filmsList[a].title)
             filmsList[a].magnetLink = 'magnet:?xt=urn:btih:'+filmsList[a].torrents[0].hash+'&dn=&tr=http://track.one:1234/announce&tr=udp://track.two:80'
           }
-          // else if(filmsList[a].name) {
-          //   console.log(filmsList[a].name)
-          // }
+          else if(filmsList[a].name) {
+            // console.log(filmsList[a].name)
+          }
         }
-          // console.log(filmsList[a].magnetLink)
+        // console.log(filmsList[a].magnetLink)
         // console.log("\n")
 
         var x = 0

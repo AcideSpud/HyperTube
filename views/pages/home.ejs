@@ -209,7 +209,6 @@
 	        	if (data.filmsList == 'empty') {
 	        		$('#alert').css("display", "block");
 	        		$('#alertMsg').text("Aucun résultat correspondant!");
-	        		// $('#alert').append($('#reload').clone().css('position', 'absolute'))
 	        	}
 	        	else {
 					var filmsList = data.filmsList;
@@ -236,12 +235,6 @@
 								clone.find('#browseFilm').on('click', function () {
 									$('#watch').submit();
 								});
-								// clone.find('#browseFilm').on('click', function () {
-								// 	var request = new XMLHttpRequest();
-								// 	request.open('POST', '/watch/datas', true);
-								// 	request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-								// 	request.send("movie="+JSON.stringify(filmsList));
-								// });
 								clone.hide().fadeIn()
 								$('#filmsList').append(clone);
 						}

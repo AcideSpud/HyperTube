@@ -25,16 +25,18 @@ body {
 }
 
 #forgotten-pwd-btn {
-  margin-bottom: 100px;
+  margin-bottom: 15px;
 }
 
-#email, #pwd {
+#email, #mail, #pwd, #email_frgt, #pseudo, #nom, #prenom {
   height: 50px;
   text-align: center;
   font-size: 20px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
-#connection, #omniauth {
+#connection, #omniauth, #inscription, #resultat {
   width: 100%;
   text-align: center;
   color: #2f71aa;
@@ -42,7 +44,7 @@ body {
   font-weight: bolder;
 }
 
-#omniauth {
+#omniauth, #resultat {
   font-size: 20px;
 }
 
@@ -67,6 +69,19 @@ body {
 
 a:hover {
   text-decoration: none;
+}
+
+.modal-dialog {
+  height: 100%;
+}
+.modal-content {
+  top: 55%;
+  background-color: transparent;
+  border: none;
+}
+#frgt_pwd_form {
+  width: 100%;
+  margin-top: 15px;
 }
 
 /*Barre de navigation*/
