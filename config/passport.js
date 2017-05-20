@@ -58,7 +58,7 @@ module.exports = function(passport){
   function(accessToken, refreshToken, profile, done) {
   		//console.log('accessToken ', accessToken, 'refreshToken', refreshToken);
   		process.nextTick(function(){
-  			UserModel.findOne({'facebook.id': profile.id}, function(err, user){
+  			UserModel.findOne({'mail': profile.emails[0].value}, function(err, user){
   				if (err){
   					return done(err);
   				}
@@ -94,7 +94,7 @@ module.exports = function(passport){
   },
   function(accessToken, refreshToken, profile, done) {
    process.nextTick(function(){
-  			UserModel.findOne({'42.id': profile.id}, function(err, user){
+  			UserModel.findOne({'mail': profile.emails[0].value}, function(err, user){
   				if (err){
   					return done(err);
   				}
@@ -105,6 +105,12 @@ module.exports = function(passport){
   				else {
   					console.log('------PROFILE---2'+ JSON.stringify(profile))
   					var newUser = new UserModel();
+            newUser.forty2.id = profile.id;
+            newUser.username = profile.username;
+            newUser.nom = profile.name.familyName;
+            newUser.prenom = profile.name.givenName;
+            newUser.mail = profile.emails[0].value;
+            newUser.img = '/img/' + profile.photos[0].value;
   					newUser.save(function(err){
   						if (err)
   							throw err;
@@ -113,7 +119,8 @@ module.exports = function(passport){
   				}
   			});
   		});
-  }
+    }
   ))
+
 
 };
