@@ -443,26 +443,26 @@ io.sockets.on('connection', function (socket) {
   //L'event de nouveau commentaire sur un film
   socket.on('newComment', (data) => {
     console.log(data)
-    // async.waterfall([
-    //   function(callback){
-    //     var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
-    //     NewComment.save(function (err) {
-    //         if (err) return callback(err);
-    //       return callback(null, 'Nouveau commentaire!');
-    //     });
-    //   }
-    // ]);
+    async.waterfall([
+      function(callback){
+        var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
+        NewComment.save(function (err) {
+            if (err) return callback(err);
+          return callback(null, 'Nouveau commentaire!');
+        });
+      }
+    ]);
   })
 
   socket.on('getComments', (data) => {
     console.log(data)
-    // CommentModel.find({movie: data.movie}, function(err, comments) {
-    //   if (!err){ 
-    //     console.log('all USERS____', comments);
-    //     io.to(data.id).emit('browseComments', {comments: comments})
-    //     next();
-    //   } else {throw err;}
-    // });
+    CommentModel.find({movie: data.movie}, function(err, comments) {
+      if (!err){ 
+        console.log('all COMMENTS____', comments);
+        io.to(data.id).emit('browseComments', {comments: comments})
+        // next();
+      } else {throw err;}
+    });
     
   })
 
