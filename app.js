@@ -81,7 +81,7 @@ app.use(flash());
 app.use((req, res, next)=>{
   console.log('ahahah');
   if (req.session && req.session.user){
-    console.log('regiSTRATOR')
+    console.log('regiSTRATOR');
 
     UserModel.find({username : req.session.user.username}, (err, result)=>{
       if (err){
@@ -103,7 +103,7 @@ app.use((req, res, next)=>{
   } else{
     next();
   }
-})
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -605,7 +605,7 @@ io.sockets.on('connection', function (socket) {
 
     function getIMDbDatas(title, film) {
       return new Promise((resolve, reject) => {
-        imdb.get(title)
+        imdb.get(title, {apiKy:'5c9b875f'})
           .then(movieDatas => {
             film.movieDatas = movieDatas
               resolve(film)
