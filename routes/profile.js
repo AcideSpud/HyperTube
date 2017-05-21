@@ -29,7 +29,7 @@ router.get('/', requireLogin, function(req, res, next) {
 			console.log(err)
 		}
 		console.log('/////USER: ', user)
-		res.render('pages/profile', {user: user});
+		res.render('pages/profile', {user: user[0]});
 		next();
 	})
  });

@@ -46,32 +46,43 @@
       </div>
     </div>
 
-    <div class="col-md-6 col-md-offset-3">
-      <a href="/inscription" id="inscription-btn" type="button" class="btn btn-info">Pas encore inscrit?</a>
-        
-      <button id="forgotten-pwd-btn" type="button" class="btn btn-info" data-toggle="modal" data-target=".bd-example-modal-sm">j'ai oublié mon pwd</button>
+    <div class="container">
+      <div class="search">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+              <div class="form-section">
+                <a href="/inscription" id="inscription-btn" type="button" class="btn btn-info">Pas encore inscrit?</a>
+                  
+                <button id="forgotten-pwd-btn" type="button" class="btn btn-info" data-toggle="modal" data-target=".bd-example-modal-sm">j'ai oublié mon pwd</button>
 
-      <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-            <forn>
-            <div id="resultatFrgtPwd"></div>
-            	<div class="form-group">
-              <label class="control-label col-md-2" for="email">email:</label>
-                <div class="col-md-10">
-                  <input type="email" class="form-control" id="email_frgt" placeholder="Enter email" >
+                <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                      <forn>
+                        <div id="resultatFrgtPwd"></div>
+                        <p id="omniauth">Recevoir un nouveau password:</p>
+                        <div class="form-group">
+                          <!-- <label class="control-label col-md-2" for="email"></label> -->
+                            <div id="email_frgt-input" class="col-md-12">
+                              <input type="email" class="form-control" id="email_frgt" placeholder="Enter email..." >
+                            </div>
+                        </div>
+                        <div class="form-group"> 
+                      		<div class="col-md-offset-2 col-md-8">
+                        			<button type="submit" id="frgt_pwd_form" class="btn btn-info">Envoyer</button>
+                      		</div>
+                      	</div>
+                      </forn>
+                    </div>
+                  </div>
                 </div>
+
+              </div>
             </div>
-            <div class="form-group"> 
-          		<div class="col-md-offset-2 col-md-10">
-            			<button type="submit" id="frgt_pwd_form" class="btn btn-info">Envoyer</button>
-          		</div>
-          	</div>
-            </forn>
           </div>
         </div>
       </div>
-
     </div>
 
   </div>

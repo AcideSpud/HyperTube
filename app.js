@@ -24,7 +24,8 @@ var htmlspecialchars = require('htmlspecialchars');
 // const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
-var imdb = require('imdb-api');
+const imdb = require('imdb-api');
+// imdb.setKey('5c9b875f');
 
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
@@ -605,7 +606,8 @@ io.sockets.on('connection', function (socket) {
 
     function getIMDbDatas(title, film) {
       return new Promise((resolve, reject) => {
-        imdb.get(title, {apiKy:'5c9b875f'})
+
+        imdb.get(title, {apiKey: '5c9b875f'})
           .then(movieDatas => {
             film.movieDatas = movieDatas
               resolve(film)
@@ -652,9 +654,8 @@ io.sockets.on('connection', function (socket) {
     
     function getMovieDatas (filmsList, i, list) {
       inList(list, filmsList[i].title).then((ret) => {
+        // console.log(socket.filmsList.length+" "+filmsList[i].title)
         if (ret == 'ok') {
-          // console.log(socket.filmsList.length+" "+filmsList[i].title)
-          // console.log(filmsList[i].magnetLink)
           list.push(filmsList[i].title)
           getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
             if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
@@ -678,7 +679,7 @@ io.sockets.on('connection', function (socket) {
                 }
               })
               .catch(err => {
-                // console.log(err)
+                console.log(err)
               })
             }
             i++
@@ -687,7 +688,7 @@ io.sockets.on('connection', function (socket) {
             }
           })
           .catch(err => {
-            // console.log(err)
+            console.log(err)
             i++
             if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
@@ -696,7 +697,7 @@ io.sockets.on('connection', function (socket) {
         }
       })
       .catch((err) => {
-        // console.log(err)
+        console.log(err)
         i++
         if (i < filmsList.length) {
           getMovieDatas(filmsList, i, list)
@@ -809,18 +810,18 @@ io.sockets.on('connection', function (socket) {
       getSecondSource.then((filmsList2) => {
         filmsList = filmsList.concat(filmsList2)
 
-        // console.log("\nLISTE PIRATEBAY + YTS: ")
+        console.log("\nLISTE PIRATEBAY + YTS: ")
         for (var a = 0; a < filmsList.length; a++) {
           if (filmsList[a].title) {
-            // console.log(filmsList[a].title)
+            // console.log(filmsList[a])
             filmsList[a].magnetLink = 'magnet:?xt=urn:btih:'+filmsList[a].torrents[0].hash+'&dn=&tr=http://track.one:1234/announce&tr=udp://track.two:80'
           }
-          // else if(filmsList[a].name) {
-          //   console.log(filmsList[a].name)
-          // }
+          else if(filmsList[a].name) {
+            // console.log(filmsList[a])
+          }
         }
-          // console.log(filmsList[a].magnetLink)
-        // console.log("\n")
+        // console.log(filmsList[a].magnetLink)
+        console.log("\n")
 
         var x = 0
         getTitles(list,filmsList, x)
