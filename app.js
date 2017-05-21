@@ -24,7 +24,8 @@ var htmlspecialchars = require('htmlspecialchars');
 // const kat = new KAT();
 var PirateBay = require('thepiratebay');
 var tnp = require('torrent-name-parser');
-var imdb = require('imdb-api');
+const imdb = require('imdb-api');
+// imdb.setKey('5c9b875f');
 
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
@@ -605,7 +606,7 @@ io.sockets.on('connection', function (socket) {
 
     function getIMDbDatas(title, film) {
       return new Promise((resolve, reject) => {
-        imdb.get(title)
+        imdb.get(title, {apiKey: '5c9b875f'})
           .then(movieDatas => {
             film.movieDatas = movieDatas
               resolve(film)
@@ -811,7 +812,7 @@ io.sockets.on('connection', function (socket) {
         console.log("\nLISTE PIRATEBAY + YTS: ")
         for (var a = 0; a < filmsList.length; a++) {
           if (filmsList[a].title) {
-            console.log(filmsList[a])
+            // console.log(filmsList[a])
             filmsList[a].magnetLink = 'magnet:?xt=urn:btih:'+filmsList[a].torrents[0].hash+'&dn=&tr=http://track.one:1234/announce&tr=udp://track.two:80'
           }
           else if(filmsList[a].name) {

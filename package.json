@@ -20,7 +20,7 @@
     "ffprobe": "^1.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "htmlspecialchars": "^1.0.5",
-    "imdb-api": "^2.2.1",
+    "imdb-api": "^3.0.0",
     "kat-api-pt": "^2.0.1",
     "magnet-link": "^1.1.1",
     "moment": "^2.15.1",
