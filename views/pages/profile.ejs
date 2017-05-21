@@ -13,7 +13,12 @@
                 <!-- <div class="container text-center"> -->
                 <br>
                 <br>
+                <div class="">
+                      <img src="<%= user.img %>" alt="some_text" style="width:220px;height:200px;">
+                    </div>
 
+                <br>
+                <br>
                  <form class="form-inline">
                   <div class="">
                     <label for="email"><span id="validator_email" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_email" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
@@ -74,6 +79,7 @@
                 <form class="" id="uploadImgForm" enctype="multipart/form-data" action="/profile/img" method="post">
                     <div class="">
                       <p id="omniauth">Select a picture:</p>
+
                       <input id="img" class="btn btn-info" type="file" name="userImg" multiple style="display:inline;"/>
                     </div>
                     <div class="form-group">
@@ -82,6 +88,7 @@
                     <div class="">
                       <input id="b_img" class="btn btn-info"  value="Upload" type="submit">
                     </div>
+
                   </form>
 
               <!-- </div> -->
