@@ -127,9 +127,9 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log('res----', res.user);
-    console.log('req----', req.user.facebook);
-    req.session.user = req.user.facebook;
+
+    console.log('req----', req.user);
+    req.session.user = req.user;
     res.redirect('/home');
   });
 
@@ -139,7 +139,7 @@ app.get('/auth/42', passport.authenticate('42'));
     app.get('/auth/42/callback',
   passport.authenticate('42', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log('res----', res.user);
+
     console.log('req----', req.user);
     req.session.user = req.user;
     res.redirect('/home');

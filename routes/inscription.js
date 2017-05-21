@@ -50,6 +50,7 @@ async.waterfall([
 
 		else{
 			var NewUser = new UserModel({ username : username, pwd : pawd, mail: email, nom: nom, prenom: prenom, langue: 'ang', img: 'img/noprimpic.png'});
+
 			NewUser.save(function (err) {
   				if (err) return callback(err);
 				return callback(null, 'TU es enregistre');
