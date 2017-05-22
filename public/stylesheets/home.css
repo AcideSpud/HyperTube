@@ -44,10 +44,10 @@ body {
   font-weight: bolder;
 }
 
-#omniauth, #resultat, .radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe {
+#omniauth, #resultat, .radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe, #status {
   font-size: 20px;
 }
-.radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe {
+.radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe, #status {
   color: #2f71aa;
 }
 
@@ -377,6 +377,21 @@ footer {
   }
 }
 
+@media (max-width: 1200px) {
+  .thumbnail {
+    width: 65px;
+  }
+}
+
+@media (max-width: 990px) {
+  .thumbnail {
+    width: 55px;
+  }
+}
+
+
+  
+
 @media (max-width: 430px) {
   #logo {
     /*width: 80*/
@@ -384,9 +399,3 @@ footer {
     margin-right: 0%;
   }
 }
-
-  /*.navbar-right {
-    margin-right: -15px;
-  }*/
-
-

@@ -59,7 +59,7 @@
 						<div class="col-sm-11">
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<strong>myusername</strong> <span class="text-muted">commented 5 days ago</span>
+									<strong class="pseudo">myusername</strong> <span class="text-muted">commented:</span>
 								</div>
 								<div class="panel-body">
 									Panel content
@@ -89,19 +89,35 @@
 		e.currentTarget.placeholder = 'Commenter le film...';
 	});
 
+	$("#comment-model").css('display', 'none');
+
 
 	var socket = io.connect('http://localhost:8080');
 	socket.on('connect', function() {
 
 		socket.emit('getComments', {id: socket.id, movie: $('#magnet').attr('value')});
 
+		socket.on('browseComments', (data) => {
+			for (var i = 0; i < data.comments.length; i++) {
+				var clone = $("#comment-model").clone();
+				clone.css('display', 'block')
+				clone.attr('id', '')
+				clone.find('.user-photo').attr('src', data.comments[i].img)
+				clone.find('.pseudo').text(data.comments[i].username)
+				clone.find('.panel-body').text(data.comments[i].comment)
+	            $('#comment-section').append(clone);
+			}
+		});
+
 		$("#filmSearch").on('keyup', (e) => {
 	        if ((e.keyCode == 13) && ($("#filmSearch").val() != '')) {
 				var clone = $("#comment-model").clone();
+				clone.css('display', 'block')
 				clone.attr('id', '')
+				clone.find('.user-photo').attr('src', '<%=user.img%>')
+				clone.find('.pseudo').text('<%=user.username%>')
 				clone.find('.panel-body').text($("#filmSearch").val())
 	            $('#comment-section').append(clone);
-	            console.log('<%=title%>')
 	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user.username%>', img: '<%=user.img%>', comment: $("#filmSearch").val()});
 	        }
 	    });

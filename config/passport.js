@@ -74,7 +74,8 @@ module.exports = function(passport){
   					newUser.nom = profile.name.familyName;
   					newUser.prenom = profile.name.givenName;
   					newUser.mail = profile.emails[0].value;
-  					newUser.img = '/img/' + profile.photos[0].value;
+  					newUser.img = 'img/noprimpic.png';
+            newUser.langue = 'ANG';
 					console.log('----' + newUser);
   					newUser.save(function(err){
   						if (err)
@@ -110,7 +111,8 @@ module.exports = function(passport){
             newUser.nom = profile.name.familyName;
             newUser.prenom = profile.name.givenName;
             newUser.mail = profile.emails[0].value;
-            newUser.img = '/img/' + profile.photos[0].value;
+            newUser.img = profile.photos[0].value;
+            newUser.langue = 'ANG';
   					newUser.save(function(err){
   						if (err)
   							throw err;

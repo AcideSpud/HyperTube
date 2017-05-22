@@ -14,8 +14,26 @@ router.use(bodyParser.urlencoded({ extended: false }));
 var UserModel = require("../models/userModel.js").UserModel;
 var CommentModel = require("../models/CommentModel.js").CommentModel;
 //
-router.get('/', (req, res)=> {
-    res.render('pages/watch', {movie: req.body.movie, title: req.body.title});
+
+function requireLogin (req, res, next) {
+    if (!req.user) {
+        console.log('NOOOPE')
+        res.redirect('/');
+    } else {
+        next();
+    }
+};
+
+
+router.get('/', requireLogin, (req, res)=> {
+    UserModel.find({username : req.session.user.username}, (err, user)=>{
+        if (err){
+            console.log(err)
+        }
+        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, user: user});
+        next();
+    })
+    
 });
 
 

@@ -127,9 +127,9 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log('res----', res.user);
-    console.log('req----', req.user.facebook);
-    req.session.user = req.user.facebook;
+
+    console.log('req----', req.user);
+    req.session.user = req.user;
     res.redirect('/home');
   });
 
@@ -139,7 +139,7 @@ app.get('/auth/42', passport.authenticate('42'));
     app.get('/auth/42/callback',
   passport.authenticate('42', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log('res----', res.user);
+
     console.log('req----', req.user);
     req.session.user = req.user;
     res.redirect('/home');
@@ -443,26 +443,26 @@ io.sockets.on('connection', function (socket) {
   //L'event de nouveau commentaire sur un film
   socket.on('newComment', (data) => {
     console.log(data)
-    // async.waterfall([
-    //   function(callback){
-    //     var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
-    //     NewComment.save(function (err) {
-    //         if (err) return callback(err);
-    //       return callback(null, 'Nouveau commentaire!');
-    //     });
-    //   }
-    // ]);
+    async.waterfall([
+      function(callback){
+        var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
+        NewComment.save(function (err) {
+            if (err) return callback(err);
+          return callback(null, 'Nouveau commentaire!');
+        });
+      }
+    ]);
   })
 
   socket.on('getComments', (data) => {
     console.log(data)
-    // CommentModel.find({movie: data.movie}, function(err, comments) {
-    //   if (!err){ 
-    //     console.log('all USERS____', comments);
-    //     io.to(data.id).emit('browseComments', {comments: comments})
-    //     next();
-    //   } else {throw err;}
-    // });
+    CommentModel.find({movie: data.movie}, function(err, comments) {
+      if (!err){ 
+        console.log('all COMMENTS____', comments);
+        io.to(data.id).emit('browseComments', {comments: comments})
+        // next();
+      } else {throw err;}
+    });
     
   })
 
@@ -618,16 +618,16 @@ io.sockets.on('connection', function (socket) {
       })
     }
 
-    function inList(list, title) {
+    function inList(list, film) {
       return new Promise((resolve, reject) => {
-        // if (title == '') {
-        //   reject('Erreur inList: pas de titre!')
-        // }
-        if ((list.indexOf(title)) == -1) {
-          resolve('ok')
+        if (film.title == '') {
+          reject('Erreur inList: pas de titre!')
+        }
+        if ((list.indexOf(film.title)) == -1) {
+          resolve(film)
         }
         else {
-          reject("film en doublon: "+title)
+          reject("film en doublon: "+film.title)
         }
       })
     }
@@ -642,7 +642,6 @@ io.sockets.on('connection', function (socket) {
         for (var i = 0; i < length; i++) {
           if (socket.genres.indexOf(genresTab[i].trim()) == -1) {
             socket.genres.push(genresTab[i].trim())
-            // console.log(socket.genres)
           }
           if (i == (length - 1)) {
             resolve('ok')
@@ -653,15 +652,13 @@ io.sockets.on('connection', function (socket) {
 
     
     function getMovieDatas (filmsList, i, list) {
-      inList(list, filmsList[i].title).then((ret) => {
-        // console.log(socket.filmsList.length+" "+filmsList[i].title)
-        if (ret == 'ok') {
-          list.push(filmsList[i].title)
+      inList(list, filmsList[i]).then((ret) => {
+        if (ret) {
+          list.push(ret.title)
           getIMDbDatas(filmsList[i].title, filmsList[i]).then((film) => {
             if (film.movieDatas && (film.movieDatas.poster.slice(0, 4) == "http")) {
               getGenres(film.movieDatas.genres).then((r) => {
                 if (r == 'ok') {
-                  // console.log(i+" "+filmsList.length)
                   if (i == filmsList.length) {
                     io.to(data.id).emit('browseGenres', {genres: socket.genres})
                   }
@@ -673,22 +670,25 @@ io.sockets.on('connection', function (socket) {
                     socket.filmsListLength = socket.filmsListLength + 1  
                     socket.filmsList.push(film)
                   }
-                  if (((socket.filmsListLength <= 8) && (!filmsList[i + 1])) || (socket.filmsListLength == 8)) {
-                    firstRow(socket.filmsList)
+                  if (socket.filmsListLength <= 8){
+                    io.to(data.id).emit('browseFilmsList', {filmsList: film})
                   }
                 }
               })
               .catch(err => {
-                console.log(err)
+                // console.log(err)
               })
             }
             i++
             if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
             }
+            if ((i >= (filmsList.length - 1) && !socket.filmsListLength)) {
+              io.to(data.id).emit('noFilmsList', {alert: 'Aucun résultat correspondant!'})
+            }
           })
           .catch(err => {
-            console.log(err)
+            // console.log(err)
             i++
             if (i < filmsList.length) {
               getMovieDatas(filmsList, i, list)
@@ -697,7 +697,7 @@ io.sockets.on('connection', function (socket) {
         }
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
         i++
         if (i < filmsList.length) {
           getMovieDatas(filmsList, i, list)
@@ -709,28 +709,37 @@ io.sockets.on('connection', function (socket) {
     function getTitles(list, filmsList, i) {
       var filmsListLength = filmsList.length
       return new Promise((resolve, reject) => {
-        if (filmsList[i].name) {
-          var parsedDatas = tnp(filmsList[i].name)
-          filmsList[i].title = parsedDatas.title
+        if (!filmsList[0]) {
+          reject("getTitles: liste vide")
         }
-        else if (filmsList[i].title) {
-          var parsedDatas = tnp(filmsList[i].title)
-          filmsList[i].title = parsedDatas.title
-        }
-        if (filmsList[i].title == '') {
-          reject("erreur tnp")
-        }
-        i++
-        if (i < filmsListLength) {            
-          resolve(i)
-          getTitles(list, filmsList, i).then((length) => {
-            if (length == (filmsList.length - 1)) {
-              sortList(filmsList, (filmsList) => {
-                var x = 0
-                getMovieDatas(filmsList, x, list)
-              })
-            }
-          })
+        else {
+          if (filmsList[i].name) {
+            var parsedDatas = tnp(filmsList[i].name)
+            filmsList[i].title = parsedDatas.title
+          }
+          else if (filmsList[i].title) {
+            var parsedDatas = tnp(filmsList[i].title)
+            filmsList[i].title = parsedDatas.title
+          }
+          // console.log(i+" "+filmsList[i].title)
+          if (filmsList[i].title == '') {
+            reject("erreur tnp")
+          }
+          i++
+          if (i < filmsListLength) {            
+            resolve(i)
+            getTitles(list, filmsList, i).then((length) => {
+              if (length == (filmsList.length - 1)) {
+                sortList(filmsList, (filmsList) => {
+                  var x = 0
+                  getMovieDatas(filmsList, x, list)
+                })
+              }
+            })
+            .catch(err => {
+              // console.log(err)
+            })
+          }
         }
       })
     }
@@ -810,26 +819,34 @@ io.sockets.on('connection', function (socket) {
       getSecondSource.then((filmsList2) => {
         filmsList = filmsList.concat(filmsList2)
 
-        console.log("\nLISTE PIRATEBAY + YTS: ")
+        // console.log("\nLISTE PIRATEBAY + YTS: ")
         for (var a = 0; a < filmsList.length; a++) {
           if (filmsList[a].title) {
-            // console.log(filmsList[a])
+            // console.log(a+" "+filmsList[a].title)
             filmsList[a].magnetLink = 'magnet:?xt=urn:btih:'+filmsList[a].torrents[0].hash+'&dn=&tr=http://track.one:1234/announce&tr=udp://track.two:80'
           }
-          else if(filmsList[a].name) {
-            // console.log(filmsList[a])
-          }
+          // else if(filmsList[a].name) {
+          //   console.log(a+" "+filmsList[a].name)
+          // }
         }
-        // console.log(filmsList[a].magnetLink)
-        console.log("\n")
+        // console.log("\n")
 
         var x = 0
         getTitles(list,filmsList, x)
-        .catch(err => console.log(err))
+        .catch(err => {
+          // console.log(err)
+          if (err == 'getTitles: liste vide') {
+            io.to(data.id).emit('noFilmsList', {alert: 'Aucun résultat correspondant!'})
+          }
+        })
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        // console.log(err)
+      })
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      // console.log(err)
+    })
   });
 });
 
