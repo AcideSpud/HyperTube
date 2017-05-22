@@ -26,7 +26,7 @@ class   Video{
             engine.files.forEach((file)=> {
 
                     console.log(`||  Nom des fichiers : ${compteur}. ${file.name}`);
-                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' || file.name != 'sample.mkv')) {
+                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' && file.name != 'sample.mkv'&& file.name != 'ETRG.mp4')) {
                         info[compteurObj] = {name: file.name, size: file.length};
                         compteurObj++;
                     }
@@ -49,7 +49,7 @@ class   Video{
     static  runStream(name) {
         return new Promise((resolve, reject)=> {
             console.log('WE CAME HERE ONE DAY ! ')
-            var fstream = fs.createReadStream('./public/' + name)
+            var fstream = fs.createReadStream('/tmp/' + name)
                 .on('open', () => {
                     console.log(`Beginning READ Mp4 file`);
                     resolve(fstream);
@@ -57,32 +57,37 @@ class   Video{
                 .on('error', (err) => {
                     console.log(`ERR : ${err}`);
                     reject(err);
-                });
+                })
+                .on('end', ()=>{
+                    console.log('END OF STREAM');
+                })
+
 
         })
     };
 
 
-    static  getDownFile(mlink){
+    static  getDownFile(mlink , res){
         return new Promise((resolve, reject)=> {
             var engine = torrentStream(mlink);
                 engine.on('ready', () => {
                     var size = 0;
                     let cmp = 0;
+
                     engine.files.forEach((file) => {
-                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv')) && (file.name != 'sample.avi' || file.name != 'sample.mkv')) {
+                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv')) && (file.name != 'sample.avi' && file.name != 'sample.mkv' && file.name != 'ETRG.mp4')) {
                         var datalength = 0;
                         size += file.length;
                         console.log('filename:', file.name);
                         var stream = file.createReadStream(file);
-                        var down = fs.createWriteStream('./public/' + file.name);
+                        var down = fs.createWriteStream('/tmp/' + file.name);
                         var test = true;
 
                         stream.on('data', (chunck) => {
                             datalength += chunck.length;
-                            if (test) {
-                                let percent = 0.05;
-                                let fChunk = stat.size * percent;
+                            /*if (test) {
+                                let percent = 0.03;
+                                let fChunk = size * percent;
                                 if (datalength > fChunk && test) {
                                     test = false;
                                     this.runStream(file.name).then((stream)=>{
@@ -93,12 +98,17 @@ class   Video{
                                     });
 
                                 }
-                            }
+                            }*/
 
                         });
                         stream.on('error', (err)=>{
                            reject(err);
                         });
+                        stream.on('end',()=>{
+                            console.log('end of stream ! 2');
+                            engine.destroy();
+                        });
+                        pump(stream, down);
                         var command = ffmpeg(stream)
                             .outputOption('-movflags frag_keyframe+faststart')
                             .outputOption('-deadline realtime')
@@ -116,7 +126,7 @@ class   Video{
                                 console.log('Processing finished !');
                             });
                           //  pump(stream, down);
-                            pump(command, down);
+                            pump(command, res);
 
 
                         //down.on('finish', () => {
@@ -139,12 +149,12 @@ class   Video{
                 var size = 0;
                 console.log('ready');
                 engine.files.forEach((file) => {
-                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' || file.name != 'sample.mkv')) {
+                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' && file.name != 'sample.mkv'&& file.name != 'ETRG.mp4')) {
                         var datalength = 0;
                         size = file.length;
                         console.log('filename:', file.name);
                         var stream = file.createReadStream(file);
-                        var down = fs.createWriteStream('./public/' + file.name);
+                        var down = fs.createWriteStream('/tmp/' + file.name);
                         var test = true;
                         stream.on('open',()=>{
                             console.log('open');
@@ -152,10 +162,11 @@ class   Video{
                         stream.on('data', (chunck) => {
                             datalength += chunck.length;
                             if (test) {
-                                let percent = 0.05;
+                                let percent = 0.06;
                                 let fChunk = size * percent;
                                 if (datalength > fChunk && test) {
                                     test = false;
+                                    console.log('runHERE');
                                         resolve(file.name);
 
                                 }
@@ -176,7 +187,7 @@ class   Video{
         })
     }
     static mp4Read(res, name){
-        let f_stream = fs.createReadStream(`./public/` + name);
+        let f_stream = fs.createReadStream(`/tmp/` + name);
         f_stream.on(`open`, ()=>{
             pump(f_stream, res);
             console.log(`beginning Stream ! `);
