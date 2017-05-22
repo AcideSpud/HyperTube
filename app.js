@@ -48,12 +48,15 @@ var watch = require('./routes/watch');
 //MODEL
 var UserModel = require("./models/userModel.js").UserModel;
 var CommentModel = require("./models/CommentModel.js").CommentModel;
+var WatchedModel = require("./models/WatchedModel.js").WatchedModel;
 
 require('./config/passport.js')(passport);
 
 
 
 var app = express();
+
+var userz = [];
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -440,9 +443,19 @@ io.sockets.on('connection', function (socket) {
         })
     }
 
+  //Mise à jour de la liste des utilisateurs connéctés
+  socket.on('newUser', function(data) {
+    console.log(data.login)
+    for (var i = 0; i < userz.length; i++) {
+      if (userz[i].login == data.login) {
+        userz.splice(i, 1);
+      }
+    }
+    userz.push(data);
+  });
+
   //L'event de nouveau commentaire sur un film
   socket.on('newComment', (data) => {
-    console.log(data)
     async.waterfall([
       function(callback){
         var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
@@ -455,13 +468,45 @@ io.sockets.on('connection', function (socket) {
   })
 
   socket.on('getComments', (data) => {
-    console.log(data)
     CommentModel.find({movie: data.movie}, function(err, comments) {
-      if (!err){ 
-        console.log('all COMMENTS____', comments);
+      if (!err){
         io.to(data.id).emit('browseComments', {comments: comments})
-        // next();
       } else {throw err;}
+    });
+    
+  })
+
+  //L'event d'enregistrement sur db de la lecture d'un film
+  socket.on('watched', (data) => {
+    console.log('watched' +data)
+    WatchedModel.find({username : data.username, movieId: data.movieId}, function(err, watched) {
+      if (!watched[0]){ 
+        async.waterfall([
+          function(callback){
+            var NewWatched = new WatchedModel({ username : data.username, movieId: data.movieId});
+            NewWatched.save(function (err) {
+                if (err) return callback(err);
+              return callback(null, 'Nouveau film visionné!');
+            });
+          }
+        ]);
+      } else if (err){throw err;}
+    });
+  })
+
+  //L'event de vérification d'un précédent visonnage du film
+  socket.on('isWatched', (data) => {
+    console.log('isWatched '+data.username)
+    WatchedModel.find({username : data.username, movieId: data.movieId}, function(err, watched) {
+      if (!err){ 
+        var id = '';
+          for (var i = 0; i < userz.length; i++) {
+            if (userz[i].login == data.username) {
+              id = userz[i].id;
+            }
+          }
+        io.to(id).emit('gotWatched', {msg: "yes", movieId: data.movieId})
+      } else if (err){throw err;}
     });
     
   })

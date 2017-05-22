@@ -17,6 +17,7 @@
 					<div id="video-player" class="row">
 						<div class="col-sm-12">
 							<input id="magnet" type="hidden" name="" value='<%=movie%>'>
+							<input id="movieId" type="hidden" name="" value='<%=movieId%>'>
 						</div><!-- /col-sm-1 -->
 					</div><!-- /row -->
 
@@ -85,6 +86,9 @@
 	var socket = io.connect('http://localhost:8080');
 	socket.on('connect', function() {
 
+    	socket.emit('newUser', {login: '<%=user.username%>', id: socket.id});
+
+		socket.emit('watched', {id: socket.id, movieId: $('#movieId').attr('value'), username: '<%=user.username%>'});
 		socket.emit('getComments', {id: socket.id, movie: $('#magnet').attr('value')});
 
 		socket.on('browseComments', (data) => {

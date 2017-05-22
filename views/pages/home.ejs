@@ -175,6 +175,7 @@
 						<form id="watch" action="watch/datas" method="post">
 							<input id="movieDatas" type="hidden" name="movie">
 							<input id="movieTitle" type="hidden" name="title">
+							<input id="movieId" type="hidden" name="movieId">
 							<!-- <input type="submit" value="Submit" style="display: none;">
 							<a id="browseFilm" type="submit" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></a> -->
 							<button  id="browseFilm" type="submit" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></button>
@@ -199,6 +200,8 @@
 		var socket = io.connect('http://localhost:8080');
     	socket.on('connect', function() {
 
+	    	socket.emit('newUser', {login: '<%=user%>', id: socket.id});
+
     		var id = 0;
 
 	        socket.emit('getFilmsList', {id: socket.id});
@@ -208,6 +211,11 @@
 	        	$('#loadAnim').css("display", "none");
 	        	$('#alert').css("display", "block");
 	        	$('#alertMsg').text("Aucun résultat correspondant!");
+	        })
+
+	        socket.on('gotWatched', (data) => {
+        		console.log(data)
+        		// console.log($('#movieId[value="'+data.movieId+'"]'))
 	        })
 
 	        socket.on('browseFilmsList', (data) => {
@@ -221,6 +229,7 @@
 					if (filmsList.movieDatas) {
 						var poster = filmsList.movieDatas.poster;
 						if ((poster.slice(0, 4) == "http")) {
+	        					socket.emit('isWatched', {id: socket.id, username: '<%=user%>', movieId: filmsList.id});
 								var clone = $("#model").clone();
 								clone.css("display", "block");
 								clone.attr("id", id++);
@@ -238,6 +247,7 @@
 								clone.find('.summary').text("Résumé: "+filmsList.movieDatas.plot);
 								clone.find('#movieDatas').attr('value', filmsList.magnetLink)
 								clone.find('#movieTitle').attr('value', filmsList.title)
+								clone.find('#movieId').attr('value', filmsList.id)
 								clone.find('#browseFilm').on('click', function () {
 									$('#watch').submit();
 								});

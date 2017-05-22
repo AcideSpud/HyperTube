@@ -31,8 +31,8 @@ router.get('/', requireLogin, (req, res)=> {
         if (err){
             console.log(err)
         }
-        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, user: user});
-        next();
+        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, movieId: req.body.movieId, user: user});
+        // next();
     })
     
 });
@@ -40,9 +40,12 @@ router.get('/', requireLogin, (req, res)=> {
 
 router.post('/datas', (req, res)=> {
 	console.log(req.body)
-	// res.end()
-	// res.redirect('/watch', {movie: req.body.movie})
-  	res.render('pages/watch', {movie: req.body.movie, title: req.body.title});
+	UserModel.find({username : req.session.user.username}, (err, user)=>{
+        if (err){
+            console.log(err)
+        }
+        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, movieId: req.body.movieId, user: user});
+    })
 });
 router.get('/bob', (req, res)=> {
     res.render('pages/video');
