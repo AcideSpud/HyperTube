@@ -204,6 +204,12 @@
 	        socket.emit('getFilmsList', {id: socket.id});
 	        $('#loadAnim').css("display", "block");
 
+	        socket.on('noFilmsList', (data) => {
+	        	$('#loadAnim').css("display", "none");
+	        	$('#alert').css("display", "block");
+	        	$('#alertMsg').text("Aucun résultat correspondant!");
+	        })
+
 	        socket.on('browseFilmsList', (data) => {
 		        $('#loadAnim').css("display", "none");
 	        	if (data.filmsList == 'empty') {
@@ -280,6 +286,7 @@
 
 			$("#filmSearch").on('keyup', (e) => {
 		        if (e.keyCode == 13) {
+		        	$('#alert').css("display", "none");
 					var clone = $("#model").clone();
 		            $('#filmsList').html('');
 		            $('#filmsList').append(clone);
