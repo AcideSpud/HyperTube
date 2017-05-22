@@ -23,7 +23,7 @@ router.get('/', requireLogin, function(req, res, next) {
 		if (err){
 			console.log(err)
 		}
-		res.render('pages/home', {user: user.username});
+		res.render('pages/home', {user: user});
 		next();
 	})
  });
