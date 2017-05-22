@@ -18,7 +18,6 @@ var CommentModel = require("../models/CommentModel.js").CommentModel;
 
 function requireLogin (req, res, next) {
     if (!req.user) {
-        console.log('NOOOPE')
         res.redirect('/');
     } else {
         next();

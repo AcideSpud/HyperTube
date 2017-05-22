@@ -15,7 +15,6 @@ var UserModel = require("../models/userModel.js").UserModel;
 
 function requireLogin (req, res, next) {
 	if (!req.user) {
-		console.log('NOOOPE')
 		res.redirect('/');
 	} else {
 		next();
@@ -28,7 +27,6 @@ router.get('/', requireLogin, function(req, res, next) {
 		if (err){
 			console.log(err)
 		}
-		console.log('/////USER: ', user)
 		res.render('pages/profile', {user: user[0]});
 		next();
 	})
@@ -71,8 +69,6 @@ router.post('/img', (req, res)=>{
     		callback(null, './public/img');
   		},
   		filename: function (req, file, callback) {
-
-  			console.log('file', file);
   			if (file.mimetype == 'image/jpeg'){
   				var	path = file.fieldname + '-' + Date.now() + '.jpg';
   				UserModel.findOneAndUpdate({username: req.session.user.username}, {img: '/img/' + path},  (err, result)=>{
@@ -94,16 +90,12 @@ router.post('/img', (req, res)=>{
 
 	var upload = multer({ storage : storage}).single('userImg');
 
-	console.log('tupasse?')
 
 	upload(req,res,function(err) {
 
 		if(err) {
-			console.log('err', err)
             return res.status(200).end("Error uploading file.");
         }
-        console.log('coucou final')
-        // res.end("File is uploaded");
         res.status(200).end("File is uploaded");
 
     });

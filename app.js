@@ -80,10 +80,7 @@ app.use(passport.session());
 app.use(flash());
 
 app.use((req, res, next)=>{
-  console.log('ahahah');
   if (req.session && req.session.user){
-    console.log('regiSTRATOR');
-
     UserModel.find({username : req.session.user.username}, (err, result)=>{
       if (err){
         console.log(err)
@@ -127,8 +124,6 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
-
-    console.log('req----', req.user);
     req.session.user = req.user;
     res.redirect('/home');
   });
@@ -139,8 +134,6 @@ app.get('/auth/42', passport.authenticate('42'));
     app.get('/auth/42/callback',
   passport.authenticate('42', { failureRedirect: '/login' }),
   function(req, res) {
-
-    console.log('req----', req.user);
     req.session.user = req.user;
     res.redirect('/home');
   });
@@ -846,6 +839,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 //app.use(function(req, res, next) {
   //  var err = new Error('Not Found');
     //err.status = 404;

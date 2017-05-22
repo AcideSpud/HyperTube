@@ -15,7 +15,6 @@ var UserModel = require("../models/userModel.js").UserModel;
 
 function requireLogin (req, res, next) {
 	if (!req.user) {
-		console.log('NOOOPE')
 		res.redirect('/');
 	} else {
 		next();
@@ -26,7 +25,6 @@ function requireLogin (req, res, next) {
 router.get('/', function(req, res, next) {
 	UserModel.find({}, function(err, users) {
     if (!err){ 
-    	console.log('all USERS____', users);
         res.render('pages/profileList', {users: users});
   		next();
     } else {throw err;}
