@@ -11,7 +11,6 @@ var UserModel = require("../models/userModel.js").UserModel;
 
 function requireLogin (req, res, next) {
 	if (!req.user) {
-		console.log('NOOOPE')
 		res.redirect('/');
 	} else {
 		next();
@@ -24,14 +23,12 @@ router.get('/', requireLogin, function(req, res, next) {
 		if (err){
 			console.log(err)
 		}
-		console.log('/////USER: ', user)
-		res.render('pages/home', {user: user.username});
+		res.render('pages/home', {user: user});
 		next();
 	})
  });
 
 router.get('/test', (req, res)=> {
-    console.log('test');
     res.end();
 })
 

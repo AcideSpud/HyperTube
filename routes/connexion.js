@@ -43,22 +43,16 @@ router.post('/connexion', (req, res)=>{
 let email = sanitizeHtml(req.body.email);
 let pwd = req.body.pwd;
 
-console.log('email: ', email, 'pwd: ', pwd);
-
-
-
 async.waterfall([
 	function findUser(callback){
 		if (email.match(/[@]/))
 			UserModel.find({mail : email}, (err, UserByMail)=>{
 				if (err) return callback(err);
-				console.log('USERBYMAIL:', UserByMail)
 				return callback(null, UserByMail);
 			});
 		else
 			UserModel.find({username : email}, (err, UserByPseudo)=>{
 			if (err) return callback(err)
-			console.log('USERBYPSEUDO: ',UserByPseudo);
 			return callback(null, UserByPseudo);
 		})
 	},
@@ -66,7 +60,6 @@ async.waterfall([
 		if (user && user[0]){
 			if (bcrypt.compareSync(pwd, user[0].pwd)){
 				req.session.user = user[0];
-				console.log('REGISTER USER: REQ>SESSION>USER: ', req.session.user.username)
 				return callback(null, 'Vous etes bien authentifié')
 			} else return callback('un mauvais mdp')
 		} else return callback('mauvais pseudo ou email/')
@@ -98,7 +91,6 @@ router.post('/frgt_pwd', (req, res)=>{
   					var query = {username: user[0].username};
 					UserModel.findOneAndUpdate(query, {pwd: bcrypt.hashSync(newpass)},  (err, query)=>{
 						if (err) return callback(err);
-						console.log('USER AFTER UPDATE, ', query);
   	  					return callback(null, newpass, query);
 					})
 			}
@@ -146,7 +138,6 @@ router.get('/logout', requireLogin, (req, res)=>{
              throw err
             }
             else {
-            	console.log('coucou2')
                 res.redirect('/')
             }
          });
