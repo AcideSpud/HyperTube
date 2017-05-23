@@ -3,6 +3,7 @@ var router = express.Router();
 let bodyParser = require('body-parser');
 let async = require('async');
 var sanitizeHtml = require('sanitize-html');
+var htmlspecialchars = require('htmlspecialchars');
 var bcrypt = require('bcryptjs');
 var multer = require('multer');
 var passport = require('passport');
@@ -22,7 +23,6 @@ function requireLogin (req, res, next) {
 };
 
 router.get('/', requireLogin, function(req, res, next) {
-	console.log(req.session.user.username);
 	UserModel.find({username : req.session.user.username}, (err, user)=>{
 		if (err){
 			console.log(err)
@@ -36,13 +36,14 @@ router.get('/', requireLogin, function(req, res, next) {
 
 
 router.post('/email', function(req, res){
+	req.body.email = htmlspecialchars(req.body.email)
 	UserModel.findOneAndUpdate( {username: req.session.user.username}, {mail: req.body.email}, {new: true},  (err, result)=>{
-		console.log(result)
 		if (err) res.status(200).send('une erreur de serveur est intervenue');
 		else res.status(200).send('Le mail a bien été modifé');
 	})
 })
 router.post('/pwd', function(req, res){
+	req.body.pwd = htmlspecialchars(req.body.pwd)
 
 	UserModel.findOneAndUpdate({username: req.session.user.username}, {pwd: bcrypt.hashSync(req.body.pwd)},  (err, result)=>{
 		if (err) res.status(200).send('une erreur de serveur est intervenue');
@@ -50,6 +51,8 @@ router.post('/pwd', function(req, res){
 	})
 })
 router.post('/nom', function(req, res){
+	req.body.nom = htmlspecialchars(req.body.nom)
+	req.body.prenom = htmlspecialchars(req.body.prenom)
 	UserModel.findOneAndUpdate({username: req.session.user.username}, {nom: req.body.nom, prenom: req.body.prenom},  (err, result)=>{
 		if (err) res.status(200).send('une erreur de serveur est intervenue');
 		else res.status(200).send('Le Nom et Prenom à bien été modifé');
@@ -57,6 +60,7 @@ router.post('/nom', function(req, res){
 })
 
 router.post('/langue', function(req, res){
+	req.body.langue = htmlspecialchars(req.body.langue)
 	UserModel.findOneAndUpdate({username: req.session.user.username}, {langue: req.body.langue},  (err, result)=>{
 		if (err) res.status(200).send('une erreur de serveur est intervenue');
 		else res.status(200).send('La langue à été changée');
@@ -100,30 +104,5 @@ router.post('/img', (req, res)=>{
 
     });
 })
-
-/*
-
-
-
-router.post('/delImg', (req, res)=>{
-
-	Utilisateur.deleteImg(req.session.user.pseudo, req.body.path, (err, result)=>{
-		if (err) res.status(200).send("Erreur Interne")
-		else res.status(200).send("Bien supprimée")
-	})
-
-})
-
-router.post('/changeProfilePic', (req, res)=>{
-
-	Utilisateur.changeProfilePic(req.session.user.pseudo, req.body.path, req.body.i, (err, result)=>{
-		if (err) res.status(200).send("Erreur Interne")
-		else res.status(200).send("Bien supprimée")
-	})
-
-})
-
-*/
-
 
 module.exports = router;

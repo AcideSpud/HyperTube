@@ -15,11 +15,8 @@
 					</div><!-- /row -->
 
 					<div id="video-player" class="row" style="margin-left: auto;margin-right: auto;text-align: center" >
-						<video style="position: relative;margin-left: auto;margin-right: auto;" width="720n" controls>
-							<!--<source src="test/La Folle Histoire de Max et Leon 2016 French AC3 1080p HDLight x264.GHT.mp4" type="video/mp4"/>-->
+						<video style="position: relative;margin-left: auto;margin-right: auto;" width="100%" controls>
 							<source src="run/<%=movie%>" type="video/mp4">
-							<!--<source src="ron/" type='video/webm;codecs="vp8, vorbis"'>-->
-							<!-- fallback -->
 							Your browser does not support the <code>video</code> element.
 						</video><!-- /col-sm-12 -->
 						<div class="col-sm-12">
@@ -106,7 +103,7 @@
 				var clone = $("#comment-model").clone();
 				clone.css('display', 'block')
 				clone.attr('id', '')
-				clone.find('.user-photo').attr('src', '../../'+data.comments[i].img)
+				clone.find('.user-photo').attr('src', data.comments[i].img)
 				clone.find('.pseudo').text(data.comments[i].username)
 				clone.find('.panel-body').text(data.comments[i].comment)
 	            $('#comment-section').append(clone);
@@ -118,11 +115,17 @@
 				var clone = $("#comment-model").clone();
 				clone.css('display', 'block')
 				clone.attr('id', '')
-				clone.find('.user-photo').attr('src', "../../<%=img%>")
+				if (("<%=img%>".slice(0, 4) == "http")) {
+					var src = "<%=img%>"
+				}
+				else{
+					var src = "../../<%=img%>"
+				}
+				clone.find('.user-photo').attr('src', src)					
 				clone.find('.pseudo').text('<%=user%>')
 				clone.find('.panel-body').text($("#filmSearch").val())
 	            $('#comment-section').append(clone);
-	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user%>', img: '<%=img%>', comment: $("#filmSearch").val()});
+	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user%>', img: src, comment: $("#filmSearch").val()});
 	        }
 	    });
 

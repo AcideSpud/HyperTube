@@ -211,8 +211,6 @@
 	        })
 
 	        socket.on('gotWatched', (data) => {
-        		console.log(data)
-        		// console.log($('#movieId[value="'+data.movieId+'"]')[0].parentElement.parentElement.firstElementChild.textContent)
         		$('#movieId[value="'+data.movieId+'"]')[0].parentElement.parentElement.firstElementChild.append('(watched)')
 	        })
 
@@ -229,7 +227,7 @@
 						if ((poster.slice(0, 4) == "http")) {
 
 	        					socket.emit('isWatched', {id: socket.id, username: '<%=user%>', movieId: filmsList.id});
-	        					
+
 								var clone = $("#model").clone();
 								clone.css("display", "block");
 								clone.attr("id", id++);

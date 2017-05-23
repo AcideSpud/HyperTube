@@ -7,10 +7,7 @@
           <div class="form-section">
             <div class="row">
 
-                <!-- <div class="container text-center"> -->
                 	<h1 id="profile">Update your profile:</h1>
-                <!-- </div> -->
-                <!-- <div class="container text-center"> -->
                 <br>
                 <br>
                 <div class="">
@@ -21,6 +18,7 @@
                 <br>
                  <form class="form-inline">
                   <div class="">
+                    <p id="omniauth">Email:</p>
                     <label for="email"><span id="validator_email" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_email" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
                     <input type="email" class="form-control" id="email" value="<%= user.mail %>" />
                   </div>
@@ -34,6 +32,7 @@
 
                  <form class="form-inline">
                   <div class="">
+                    <p id="omniauth">Password:</p>
                     <label for="pwd"><span id="validator_pwd" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_pwd" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
                     <input type="password" class="form-control" id="pwd" value="<%=user.pwd%>">
                   </div>
@@ -46,6 +45,7 @@
 
                 <form class="form-inline">
                   <div class="">
+                    <p id="omniauth">Identity:</p>
                     <label for="nom"><span id="validator_nom" style="display: none; color:green;" class="glyphicon glyphicon-ok"></span><span id="unvalidator_nom" style="color:red;" class="glyphicon glyphicon-remove"></span></label>
                     <input type="nom" class="form-control" id="nom" value="<%= user.nom %>">
                   </div>
@@ -91,7 +91,6 @@
 
                   </form>
 
-              <!-- </div> -->
             </div>
           </div>
         </div>
@@ -106,30 +105,12 @@
     e.currentTarget.value = '';
   });
 
-  // $("#email").on('focusout', (e) => {
-  //   e.currentTarget.value = '<%= user.mail %>';
-  // });
-
-  // $("#pwd").on('focusout', (e) => {
-  //   e.currentTarget.value = '<%= user.pwd %>';
-  // });
-
-  // $("#nom").on('focusout', (e) => {
-  //   e.currentTarget.value = '<%= user.nom %>';
-  // });
-
-  // $("#prenom").on('focusout', (e) => {
-  //   e.currentTarget.value = '<%= user.prenom %>';
-  // });
-
   $(function(){
 
     $('#b_email').click(function(e){
       e.preventDefault();
 
       var $email = $("#email").val();
-
-      console.log('email: ', $email);
 
       if (check($email)){
             $.post(
@@ -167,8 +148,6 @@
 
       var $pwd = $("#pwd").val();
 
-      console.log('pwd: ', $pwd);
-
       if (check($pwd)){
             $.post(
                 'profile/pwd',
@@ -204,9 +183,6 @@
 
       var $nom = $("#nom").val();
       var $prenom = $('#prenom').val();
-
-      console.log('nom: ', $nom);
-      console.log('prenom: ', $prenom);
 
       if (check($nom) &&
         check($prenom)){
@@ -254,8 +230,6 @@
       var $langue = $('input[name="langue"]:checked').val();
       var $pref = $('input[name="pref"]:checked').val();
 
-      console.log('langue: ', $langue);
-
       if ($langue ){
             $.post(
                 'profile/langue',
@@ -293,7 +267,6 @@ $('#uploadImgForm').submit(function() {
               $("#status").empty().text(xhr);
             },
             success: function(response) {
-              console.log(response)
             $("#status").empty().text(response);
             }
         });

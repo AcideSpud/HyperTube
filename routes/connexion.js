@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 let bodyParser = require('body-parser');
 let async = require('async');
-//var Utilisateur = require('../models/utilisateur.js');
 var sanitizeHtml = require('sanitize-html');
 let bcrypt = require('bcryptjs');
 let nodemailer = require('nodemailer');
@@ -41,7 +40,7 @@ router.get('/', function(req, res, next) {
 router.post('/connexion', (req, res)=>{
 
 let email = sanitizeHtml(req.body.email);
-let pwd = req.body.pwd;
+let pwd = sanitizeHtml(req.body.pwd);
 
 async.waterfall([
 	function findUser(callback){
