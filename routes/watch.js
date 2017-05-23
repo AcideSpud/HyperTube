@@ -37,7 +37,7 @@ router.get('/', requireLogin, (req, res)=> {
 
 
 router.post('/datas', (req, res)=> {
-    req.body.title = htmlspecialchars(req.body.title)
+    // req.body.title = htmlspecialchars(req.body.title)
     req.body.movieId = htmlspecialchars(req.body.movieId)
 	UserModel.find({username : req.session.user.username}, (err, user)=>{
         if (err){
