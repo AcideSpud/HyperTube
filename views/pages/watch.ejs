@@ -25,6 +25,7 @@
 						<div class="col-sm-12">
 							<input id="magnet" type="hidden" name="" value='<%=movie%>'>
 							<input id="movieId" type="hidden" name="" value='<%=movieId%>'>
+							<input id="user" type="hidden" name="" value='<%=user%>'>
 						</div><!-- /col-sm-1 -->
 
 					</div><!-- /row -->
@@ -95,9 +96,9 @@
 	var socket = io.connect('http://localhost:8080');
 	socket.on('connect', function() {
 
-    	socket.emit('newUser', {login: '<%=user.username%>', id: socket.id});
+    	socket.emit('newUser', {login: '<%=user%>', id: socket.id});
 
-		socket.emit('watched', {id: socket.id, movieId: $('#movieId').attr('value'), username: '<%=user.username%>'});
+		socket.emit('watched', {id: socket.id, movieId: $('#movieId').attr('value'), username: '<%=user%>'});
 		socket.emit('getComments', {id: socket.id, movie: $('#magnet').attr('value')});
 
 		socket.on('browseComments', (data) => {
@@ -105,7 +106,7 @@
 				var clone = $("#comment-model").clone();
 				clone.css('display', 'block')
 				clone.attr('id', '')
-				clone.find('.user-photo').attr('src', data.comments[i].img)
+				clone.find('.user-photo').attr('src', '../../'+data.comments[i].img)
 				clone.find('.pseudo').text(data.comments[i].username)
 				clone.find('.panel-body').text(data.comments[i].comment)
 	            $('#comment-section').append(clone);
@@ -117,11 +118,11 @@
 				var clone = $("#comment-model").clone();
 				clone.css('display', 'block')
 				clone.attr('id', '')
-				clone.find('.user-photo').attr('src', '<%=user.img%>')
-				clone.find('.pseudo').text('<%=user.username%>')
+				clone.find('.user-photo').attr('src', "../../<%=img%>")
+				clone.find('.pseudo').text('<%=user%>')
 				clone.find('.panel-body').text($("#filmSearch").val())
 	            $('#comment-section').append(clone);
-	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user.username%>', img: '<%=user.img%>', comment: $("#filmSearch").val()});
+	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user%>', img: '<%=img%>', comment: $("#filmSearch").val()});
 	        }
 	    });
 

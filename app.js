@@ -471,7 +471,7 @@ io.sockets.on('connection', function (socket) {
 
   //L'event d'enregistrement sur db de la lecture d'un film
   socket.on('watched', (data) => {
-    console.log('watched' +data)
+    console.log('watched: ' +data.username)
     WatchedModel.find({username : data.username, movieId: data.movieId}, function(err, watched) {
       if (!watched[0]){ 
         async.waterfall([
@@ -489,9 +489,9 @@ io.sockets.on('connection', function (socket) {
 
   //L'event de vérification d'un précédent visonnage du film
   socket.on('isWatched', (data) => {
-    console.log('isWatched '+data.username)
+    console.log('isWatched '+data.username+" "+data.movieId)
     WatchedModel.find({username : data.username, movieId: data.movieId}, function(err, watched) {
-      if (!err){ 
+      if (watched[0]){ 
         var id = '';
           for (var i = 0; i < userz.length; i++) {
             if (userz[i].login == data.username) {

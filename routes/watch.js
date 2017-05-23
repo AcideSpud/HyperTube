@@ -29,7 +29,7 @@ router.get('/', requireLogin, (req, res)=> {
         if (err){
             console.log(err)
         }
-        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, movieId: req.body.movieId, user: user});
+        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, movieId: req.body.movieId, user: user[0].username, img: user[0].img});
         // next();
     })
     
@@ -37,19 +37,21 @@ router.get('/', requireLogin, (req, res)=> {
 
 
 router.post('/datas', (req, res)=> {
-	console.log(req.body)
 	UserModel.find({username : req.session.user.username}, (err, user)=>{
         if (err){
             console.log(err)
         }
-        res.render('pages/watch', {movie: req.body.movie, title: req.body.title, movieId: req.body.movieId, user: user});
+        else {
+            console.log(user)
+            req.body.movie = encodeURIComponent(req.body.movie);
+            res.render('pages/watch', {movie: req.body.movie, title: req.body.title, movieId: req.body.movieId, user: user[0].username, img: user[0].img});
+        }
     })
-	// res.end()
-	// res.redirect('/watch', {movie: req.body.movie})
+    // res.end()
+    // res.redirect('/watch', {movie: req.body.movie})
     //req.body.movie = req.body.movie.slice(20);
-    req.body.movie = encodeURIComponent(req.body.movie);
 
-  	res.render('pages/watch', {movie: req.body.movie, title: req.body.title});
+  	// res.render('pages/watch', {movie: req.body.movie, title: req.body.title});
 });
 router.get('/bob', (req, res)=> {
     res.render('pages/video');

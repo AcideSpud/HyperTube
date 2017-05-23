@@ -176,11 +176,8 @@
 							<input id="movieDatas" type="hidden" name="movie">
 							<input id="movieTitle" type="hidden" name="title">
 							<input id="movieId" type="hidden" name="movieId">
-							<!-- <input type="submit" value="Submit" style="display: none;">
-							<a id="browseFilm" type="submit" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></a> -->
 							<button  id="browseFilm" type="submit" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></button>
 						</form>
-						<!-- <a id="browseFilm" type="button" class="btn-o"><i class="fa fa-play-circle fa-5x"></i></a> -->
 						<div class="year"></div>
 						<div class="rating"></div>
 						<div class="summary"></div>
@@ -215,7 +212,8 @@
 
 	        socket.on('gotWatched', (data) => {
         		console.log(data)
-        		// console.log($('#movieId[value="'+data.movieId+'"]'))
+        		// console.log($('#movieId[value="'+data.movieId+'"]')[0].parentElement.parentElement.firstElementChild.textContent)
+        		$('#movieId[value="'+data.movieId+'"]')[0].parentElement.parentElement.firstElementChild.append('(watched)')
 	        })
 
 	        socket.on('browseFilmsList', (data) => {
@@ -229,7 +227,9 @@
 					if (filmsList.movieDatas) {
 						var poster = filmsList.movieDatas.poster;
 						if ((poster.slice(0, 4) == "http")) {
+
 	        					socket.emit('isWatched', {id: socket.id, username: '<%=user%>', movieId: filmsList.id});
+	        					
 								var clone = $("#model").clone();
 								clone.css("display", "block");
 								clone.attr("id", id++);
