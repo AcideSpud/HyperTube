@@ -106,7 +106,7 @@
 				var clone = $("#comment-model").clone();
 				clone.css('display', 'block')
 				clone.attr('id', '')
-				clone.find('.user-photo').attr('src', '../../'+data.comments[i].img)
+				clone.find('.user-photo').attr('src', data.comments[i].img)
 				clone.find('.pseudo').text(data.comments[i].username)
 				clone.find('.panel-body').text(data.comments[i].comment)
 	            $('#comment-section').append(clone);
@@ -118,11 +118,17 @@
 				var clone = $("#comment-model").clone();
 				clone.css('display', 'block')
 				clone.attr('id', '')
-				clone.find('.user-photo').attr('src', "../../<%=img%>")
+				if (("<%=img%>".slice(0, 4) == "http")) {
+					var src = "<%=img%>"
+				}
+				else{
+					var src = "../../<%=img%>"
+				}
+				clone.find('.user-photo').attr('src', src)					
 				clone.find('.pseudo').text('<%=user%>')
 				clone.find('.panel-body').text($("#filmSearch").val())
 	            $('#comment-section').append(clone);
-	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user%>', img: '<%=img%>', comment: $("#filmSearch").val()});
+	            socket.emit('newComment', {id: socket.id, movie: $('#magnet').attr('value'), username: '<%=user%>', img: src, comment: $("#filmSearch").val()});
 	        }
 	    });
 
