@@ -12,29 +12,18 @@
 		</div>
 	</div>
 
-		<!-- <main class="wrapper">
-		
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
 
-		<div class="container">
-			<ul id="filmsList">
-				
-			</ul>
-			
-		</div>			
-		</main> -->
-
-
-		<script src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript">
-
-			$("#logoutIcon").css('display', 'none');
-		    $("#profileIcon").css('display', 'none');
-		    $("#homeIcon").css('display', 'none');
-		    
-			var socket = io.connect('http://localhost:8080');
-	    	socket.on('connect', function() {
-		        
-	    	});
-		</script>
+		$("#logoutIcon").css('display', 'none');
+		$("#profileIcon").css('display', 'none');
+		$("#profileListIcon").css('display', 'none');
+		$("#homeIcon").css('display', 'none');
+	    
+		var socket = io.connect('http://localhost:8080');
+    	socket.on('connect', function() {
+	        
+    	});
+	</script>
 
 <%include footer %>

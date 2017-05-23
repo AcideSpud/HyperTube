@@ -18,10 +18,9 @@ function requireLogin (req, res, next) {
 };
 
 router.get('/', requireLogin, function(req, res, next) {
-	console.log(req.session.user.username);
 	UserModel.find({username : req.session.user.username}, (err, user)=>{
 		if (err){
-			console.log(err)
+			// console.log(err)
 		}
 		res.render('pages/home', {user: user[0].username, img: user[0].img});
 		next();

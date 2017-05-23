@@ -49,6 +49,7 @@ body {
 }
 .radio-inline, #result_email, #result_pwd, #result_gender, #result_sexe, #status {
   color: #2f71aa;
+  display: inherit;
 }
 
 #logo42 {
@@ -114,7 +115,6 @@ hr {
 
 /*Barre de recherche*/
 .search .form-section{
-  /*background:rgba(0,0,0,0.6);*/
   background: rgb(46, 46, 46);
   border: 2px solid #414141;
   border-radius: 5px;
@@ -146,7 +146,6 @@ hr {
 .btn-info:hover {
   background-position: 0px 0px;
   background-image: linear-gradient(to bottom,#2f71aa 0,#2aabd2 100%);
-  /*color: #9d9d9d*/
 }
 
 /*Miniatures fiche films*/
@@ -359,9 +358,6 @@ footer {
   text-align: center;
 }
 
-#video-player {
-  height: 400px;
-}
 
 
 /*@media (min-width: 768px) {*/

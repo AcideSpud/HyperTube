@@ -438,7 +438,7 @@ io.sockets.on('connection', function (socket) {
 
   //Mise à jour de la liste des utilisateurs connéctés
   socket.on('newUser', function(data) {
-    console.log(data.login)
+    data.login = htmlspecialchars(data.login)
     for (var i = 0; i < userz.length; i++) {
       if (userz[i].login == data.login) {
         userz.splice(i, 1);
@@ -449,6 +449,10 @@ io.sockets.on('connection', function (socket) {
 
   //L'event de nouveau commentaire sur un film
   socket.on('newComment', (data) => {
+    data.username = htmlspecialchars(data.username)
+    data.img = htmlspecialchars(data.img)
+    data.movie = htmlspecialchars(data.movie)
+    data.comment = htmlspecialchars(data.comment)
     async.waterfall([
       function(callback){
         var NewComment = new CommentModel({ username : data.username, img: data.img, movie: data.movie, comment: data.comment});
@@ -461,6 +465,7 @@ io.sockets.on('connection', function (socket) {
   })
 
   socket.on('getComments', (data) => {
+    data.movie = htmlspecialchars(data.movie)
     CommentModel.find({movie: data.movie}, function(err, comments) {
       if (!err){
         io.to(data.id).emit('browseComments', {comments: comments})
@@ -471,7 +476,8 @@ io.sockets.on('connection', function (socket) {
 
   //L'event d'enregistrement sur db de la lecture d'un film
   socket.on('watched', (data) => {
-    console.log('watched: ' +data.username)
+    data.username = htmlspecialchars(data.username)
+    data.movieId = htmlspecialchars(data.movieId)
     WatchedModel.find({username : data.username, movieId: data.movieId}, function(err, watched) {
       if (!watched[0]){ 
         async.waterfall([
@@ -489,7 +495,8 @@ io.sockets.on('connection', function (socket) {
 
   //L'event de vérification d'un précédent visonnage du film
   socket.on('isWatched', (data) => {
-    console.log('isWatched '+data.username+" "+data.movieId)
+    data.username = htmlspecialchars(data.username)
+    data.movieId = htmlspecialchars(data.movieId)
     WatchedModel.find({username : data.username, movieId: data.movieId}, function(err, watched) {
       if (watched[0]){ 
         var id = '';
@@ -506,6 +513,8 @@ io.sockets.on('connection', function (socket) {
 
   //L'event de pagination infini en scrollant
   socket.on('getMoreFilms', (data) => {
+    data.id = htmlspecialchars(data.id)
+
 
     var k = 0
     var j = socket.filmsIndex
@@ -532,6 +541,10 @@ io.sockets.on('connection', function (socket) {
 
   //L'event de gestion du triage/filtrage
   socket.on('getDatSort', (data) => {
+    data.id = htmlspecialchars(data.id)
+    data.sort = htmlspecialchars(data.sort)
+    data.title = htmlspecialchars(data.title)
+
 
     if (socket.filmsList2) {
       var listToSort = socket.filmsList2
@@ -616,6 +629,7 @@ io.sockets.on('connection', function (socket) {
 
   //L'event de départ lançant la création de la liste de films (avec un titre demandé ou non)
   socket.on('getFilmsList', function(data) {
+    data.id = htmlspecialchars(data.id)
 
     // Initialisation des variables
     if (data.title) {
