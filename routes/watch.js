@@ -74,80 +74,86 @@ router.get('/run/:film', (req, res)=> {
 
     test.then((info) => {
         var lsize = 0;
-        fs.access(`/tmp/${info[0].name}`, (err) => {
-            console.log('TOPTOP : ' + err);
+        fs.access(`/tmp/video/${info[0].name}`, (err) => {
                 if (!err) {
                     console.error('myfile already exists');
-                    fs.stat(`/tmp/${info[0].name}`, (errur, stat)=>{
-                        if (err){
+                    fs.stat(`/tmp/video/${info[0].name}`, (errur, stat) => {
+                        if (err) {
                             console.log(errur);
                         }
                         lsize = stat.size;
-                        console.log('SIIIIZE : ' + lsize);
+
                         if (lsize != info[0].size) {
 
-                            console.log(lsize);
-                            /*fs.access(`/tmp/${info[0].name}`, (err) => {
+
+                            fs.access(`/tmp/video/${info[0].name}`, (err) => {
                                 if (!err) {
                                     console.error('im gonna to delete u ');
-                                    fs.unlinkSync(`/tmp/${info[0].name}`);
-                                    return;
-                                }*/
-                                if (info[0].name.endsWith('.mp4')) {
-                                    console.log('yop');
-                                    var boby = Video.streamMp4(mLink);
-                                    boby.then((stream) => {
-                                        console.log('Do IT BITCH ! ' + stream);
-                                        var fstream = fs.createReadStream('/tmp/' + stream)
-                                            .on('open', () => {
-                                                console.log(`Beginning READ Mp4 file`);
-                                                pump(fstream, res);
-                                            })
-                                            .on('error', (err) => {
-                                                console.log(`ERR : ${err}`);
-                                                res.end();
+                                    fs.unlink(`/tmp/video/${info[0].name}`, ()=> {
 
+                                        if (info[0].name.endsWith('.mp4')) {
+                                            console.log('yop');
+                                            var boby = Video.streamMp4(mLink);
+                                            boby.then((stream) => {
+                                                console.log('Do IT BITCH ! ' + stream);
+                                                var fstream = fs.createReadStream('/tmp/video/' + stream)
+                                                    .on('open', () => {
+                                                        console.log(`Beginning READ Mp4 file`);
+                                                        pump(fstream, res);
+                                                    })
+                                                    .on('error', (err) => {
+                                                        console.log(`ERR : ${err}`);
+                                                        res.end();
+
+                                                    });
+                                                fstream.on('end', () => {
+                                                    console.log(`End of Stream `);
+                                                });
                                             });
-                                        fstream.on('end', () => {
-                                            console.log(`End of Stream `);
-                                        });
+                                            boby.catch((err) => {
+                                                console.log(`ERR : ${err}`);
+                                            });
+                                        }
+                                        else if (info[0].name.endsWith('.mkv') || info[0].name.endsWith('.avi')) {
+                                            retStream = Video.getDownFile(mLink, res);
+                                            /*retStream.then((stream) => {
+                                             console.log(`RUN STREAM`);
+                                             pump(stream, res);
+                                             }).catch((err) => {
+                                             console.log(`getDownInfo have fail somewhere ${err}`);
+                                             });*/
+                                        }
+                                        else {
+                                            res.end();
+                                        }
                                     });
-                                    boby.catch((err) => {
-                                        console.log(`ERR : ${err}`);
-                                    });
-                                }
-                                else if (info[0].name.endsWith('.mkv') || info[0].name.endsWith('.avi')) {
-                                    console.log('Hi im here ! ');
-                                    retStream = Video.getDownFile(mLink, res);
-                                    /*retStream.then((stream) => {
-                                        console.log(`RUN STREAM`);
-                                        pump(stream, res);
-                                    }).catch((err) => {
-                                        console.log(`getDownInfo have fail somewhere ${err}`);
-                                    });*/
-                                }
-                                else {
-                                    res.end();
-                                }
-                           // });
+                                    }
+                            });  // });
                         }
+
                         else {
                             console.log('Alredy exist  :: lets run !');
-                            Video.mp4Read(res, info[0].name);
+                            if (info[0].name.endsWith('.mp4')) {
+                                Video.mp4Read(res, info[0].name);
+                            }
+                            else if (info[0].name.endsWith('.mkv') || info[0].name.endsWith('.avi')) {
+                                video.encodeNStream(res, info[0].name);
+                            }
                         }
-                    })
+                    });
+
 
                 }
                 else if (err) {
 
                     console.log(lsize);
-                    fs.access(`/tmp/${info[0].name}`, (err) => {
+                    fs.access(`/tmp/video/${info[0].name}`, (err) => {
                         if (info[0].name.endsWith('.mp4')) {
                             console.log('yop');
                             var boby = Video.streamMp4(mLink);
                             boby.then((stream) => {
                                 console.log('Do IT BITCH ! ' + stream);
-                                var fstream = fs.createReadStream('/tmp/' + stream)
+                                var fstream = fs.createReadStream('/tmp/video/' + stream)
                                     .on('open', () => {
                                         console.log(`Beginning READ Mp4 file`);
                                         pump(fstream, res);

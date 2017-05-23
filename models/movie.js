@@ -26,7 +26,7 @@ class   Video{
             engine.files.forEach((file)=> {
 
                     console.log(`||  Nom des fichiers : ${compteur}. ${file.name}`);
-                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' && file.name != 'sample.mkv'&& file.name != 'ETRG.mp4')) {
+                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' && file.name != 'sample.mkv'&& file.name != 'ETRG.mp4'  && file.name != 'Sample.mkv' && file.name != 'Sample.avi' )) {
                         info[compteurObj] = {name: file.name, size: file.length};
                         compteurObj++;
                     }
@@ -49,7 +49,7 @@ class   Video{
     static  runStream(name) {
         return new Promise((resolve, reject)=> {
             console.log('WE CAME HERE ONE DAY ! ')
-            var fstream = fs.createReadStream('/tmp/' + name)
+            var fstream = fs.createReadStream('/tmp/video/' + name)
                 .on('open', () => {
                     console.log(`Beginning READ Mp4 file`);
                     resolve(fstream);
@@ -75,12 +75,12 @@ class   Video{
                     let cmp = 0;
 
                     engine.files.forEach((file) => {
-                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv')) && (file.name != 'sample.avi' && file.name != 'sample.mkv' && file.name != 'ETRG.mp4')) {
+                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mkv')) && (file.name != 'sample.avi' && file.name != 'sample.mkv' && file.name != 'ETRG.mp4' && file.name != 'Sample.mkv' && file.name != 'Sample.avi' )) {
                         var datalength = 0;
                         size += file.length;
                         console.log('filename:', file.name);
                         var stream = file.createReadStream(file);
-                        var down = fs.createWriteStream('/tmp/' + file.name);
+                        var down = fs.createWriteStream('/tmp/video/' + file.name);
                         var test = true;
 
                         stream.on('data', (chunck) => {
@@ -142,6 +142,28 @@ class   Video{
             });
         });
     }
+    static encodeNStream(res, path){
+        var fstream = fs.createReadStream('/tmp/video/' + path);
+        var command = ffmpeg(fstream)
+            .outputOption('-movflags frag_keyframe+faststart')
+            .outputOption('-deadline realtime')
+            .audioCodec('libmp3lame')
+            .videoCodec('libx264')
+            .format('mp4')
+            .audioBitrate(128)
+            .videoBitrate(1024)
+            .size('720x?')
+            .on('error', function(err) {
+                console.log('An error occurred: ' + err.message);
+                reject(err);
+            })
+            .on('end', function() {
+                console.log('Processing finished !');
+            });
+        //  pump(stream, down);
+        pump(command, res);
+
+    }
     static streamMp4(mLink){
         return new Promise((resolve, reject)=>{
             var engine = torrentStream(mLink);
@@ -149,12 +171,12 @@ class   Video{
                 var size = 0;
                 console.log('ready');
                 engine.files.forEach((file) => {
-                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' && file.name != 'sample.mkv'&& file.name != 'ETRG.mp4')) {
+                    if ((file.name.endsWith('.avi') || file.name.endsWith('.mp4')) && (file.name != 'sample.avi' && file.name != 'sample.mkv'&& file.name != 'ETRG.mp4' && file.name != 'Sample.mkv' && file.name != 'Sample.avi' )) {
                         var datalength = 0;
                         size = file.length;
                         console.log('filename:', file.name);
                         var stream = file.createReadStream(file);
-                        var down = fs.createWriteStream('/tmp/' + file.name);
+                        var down = fs.createWriteStream('/tmp/video/' + file.name);
                         var test = true;
                         stream.on('open',()=>{
                             console.log('open');
@@ -187,7 +209,7 @@ class   Video{
         })
     }
     static mp4Read(res, name){
-        let f_stream = fs.createReadStream(`/tmp/` + name);
+        let f_stream = fs.createReadStream(`/tmp/video/` + name);
         f_stream.on(`open`, ()=>{
             pump(f_stream, res);
             console.log(`beginning Stream ! `);

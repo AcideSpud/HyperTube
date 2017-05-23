@@ -7,6 +7,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var Datetime = require('node-datetime');
 
 
 // Les middlewares de l'app
@@ -14,8 +15,11 @@ var nodemailer = require('nodemailer');
 var moment = require('moment');
 var busboy = require('connect-busboy');
 var fs = require('fs');
+const testFolder = '/tmp/video/';
 var crypto = require('crypto');
 var htmlspecialchars = require('htmlspecialchars');
+var mkdirp = require('mkdirp');
+const util = require('util');
 
 
 // const ExtraTorrentAPI = require('extratorrent-api').Website;
@@ -109,6 +113,37 @@ app.use((req, res, next)=>{
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+mkdirp('/tmp/video', function(err) {
+    fs.readdir(testFolder, (err, files) => {
+        files.forEach(file => {
+            fs.stat('/tmp/video/'+file, (errur, stats)=>{
+                if (err){
+                    console.log(errur);
+                }
+
+                console.log(file);
+                var monthLater = stats.birthtime.setMonth(stats.birthtime.getMonth()+1);
+
+                var later = monthLater;
+                var now =  Date.now().valueOf();
+
+                if (now > later){
+                  fs.unlink('/tmp/video/' + file, ()=>{
+                    console.log(`MONTH DELAY DELETE : ${file}`);
+                  });
+                }
+                //console.log(stat.mtime);
+
+            });
+        });
+
+    });
+    // path exists unless there was an error
+    if (err){
+        console.log('DIR ALREADY EXIST');
+    }
+
+});
 
 
 let db = mongoose.connect('mongodb://localhost/HyperTube', (err)=> {
